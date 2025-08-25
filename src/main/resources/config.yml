@@ -1,0 +1,153 @@
+# ------------------------------------------------------------------ #
+#               BenthPinata - Ana Yapılandırma Dosyası               #
+# ------------------------------------------------------------------ #
+#
+# Hoş geldiniz! Bu dosyada BenthPinata eklentisinin tüm temel
+# ayarlarını bulabilirsiniz. Değişiklik yaparken dikkatli olun.
+# YAML formatı boşluklara duyarlıdır. Sekme (TAB) kullanmayın,
+# sadece boşluk (space) kullanın.
+#
+# Bir ayarı ne işe yaradığını anlamak için üstündeki yorumları okuyun.
+#
+# ------------------------------------------------------------------ #
+
+# ------------------------------------------------------------------ #
+#                           Genel Ayarlar                            #
+# ------------------------------------------------------------------ #
+general:
+  # Piñata etkinliğinin başlaması için geri sayım süresi (saniye olarak).
+  countdown-time: 15
+
+  # Piñata'ya bir oyuncunun art arda ne kadar hızlı vurabileceğini belirler (milisaniye).
+  # Spam ve lag'ı önlemek için kullanılır. 500 = saniyede 2 vuruş.
+  hit-cooldown-millis: 500
+
+  # Eğer bir Piñata türü için özel can değeri belirtilmezse,
+  # varsayılan olarak kullanılacak can değeri.
+  default-pinata-health: 100
+
+
+# ------------------------------------------------------------------ #
+#                      Piñata Türleri Ayarları                       #
+# ------------------------------------------------------------------ #
+#
+# Burada istediğiniz kadar farklı Piñata türü oluşturabilirsiniz.
+# Her türün kendine özgü konumu, canı ve diğer özellikleri olabilir.
+# Yeni bir tür eklemek için mevcut 'default' türünü kopyalayıp
+# yapıştırın ve ismini ('default') değiştirin.
+#
+# Komut: /pinata start <tür_adı> (örn: /pinata start default)
+#
+pinata-types:
+  # Bu, 'default' ismindeki Piñata türüdür.
+  default:
+    # Piñata'nın doğacağı konum.
+    # Format: 'dunya_adi;x;y;z'
+    # Bu koordinatları oyun içinde F3 tuşuna basarak veya bir komutla alabilirsiniz.
+    # ÖNEMLİ: Dünyanızın adını doğru yazdığınızdan emin olun!
+    spawn-location: 'world;0;100;0'
+
+    # Bu türe özel can değeri.
+    # Eğer bu satırı silerseniz veya yorum satırı yaparsanız (#),
+    # yukarıdaki 'default-pinata-health' değeri kullanılır.
+    health: 150
+
+  # Örnek olarak ikinci bir tür. Bu türün adı 'arena'.
+  # Bu bölümün başındaki '#' işaretini kaldırarak aktif edebilirsiniz.
+  #arena:
+  #  spawn-location: 'arena_dunyasi;150;64;-200'
+  #  # Bu tür için özel bir can belirtilmediği için 100 canla doğacaktır.
+
+
+# ------------------------------------------------------------------ #
+#                       Efekt ve Ses Ayarları                        #
+# ------------------------------------------------------------------ #
+#
+# Buradaki isimler, kullandığınız Minecraft sürümünün resmi
+# materyal isimleriyle eşleşmelidir. Hatalı isimler konsolda uyarıya
+# neden olur.
+#
+# 1.12.2 için geçerli sesler: https://helpch.at/docs/1.12.2/org/bukkit/Sound.html
+# 1.12.2 için geçerli partiküller: https://helpch.at/docs/1.12.2/org/bukkit/Particle.html
+#
+sounds:
+  countdown-start: 'ENTITY_PLAYER_LEVELUP'
+  countdown-tick: 'UI_BUTTON_CLICK'
+  spawn: 'ENTITY_ENDERDRAGON_GROWL'
+  hit: 'ENTITY_PLAYER_ATTACK_SWEEP'
+  death: 'ENTITY_WITHER_DEATH'
+
+effects:
+  hit: 'CRIT_MAGIC'
+  death: 'EXPLOSION_HUGE'
+
+
+# ------------------------------------------------------------------ #
+#                         Boss Bar Ayarları                          #
+# ------------------------------------------------------------------ #
+boss-bar:
+  # Piñata için üstte çıkan can barını aktif eder veya kapatır.
+  enabled: true
+
+  # Barın rengi.
+  # Seçenekler: BLUE, GREEN, PINK, PURPLE, RED, WHITE, YELLOW
+  color: PINK
+
+  # Barın stili.
+  # Seçenekler: SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20
+  style: SEGMENTED_20
+
+
+# ------------------------------------------------------------------ #
+#                         Hologram Ayarları                          #
+# ------------------------------------------------------------------ #
+hologram:
+  # Piñata'nın üstünde DecentHolograms ile hologram gösterilmesini aktif eder/kapatır.
+  enabled: true
+
+  # Hologramın Piñata'nın ne kadar üstünde duracağını belirler (blok cinsinden).
+  offset-y: 2.2
+
+
+# ------------------------------------------------------------------ #
+#                       Otomatik Etkinlik Sistemi                    #
+# ------------------------------------------------------------------ #
+#
+# Sunucunuzda otomatik olarak Piñata etkinliği başlatmak için
+# bu ayarları kullanabilirsiniz.
+#
+automatic-events:
+  # Zamanlayıcıya bağlı otomatik etkinlikler.
+  timed:
+    # Belirli aralıklarla otomatik etkinlik başlatmayı aktif eder/kapatır.
+    enabled: true
+
+    # Etkinliğin ne sıklıkla denenmesi gerektiğini belirtir (dakika cinsinden).
+    # 120 = Her 2 saatte bir kontrol eder ve şartlar uygunsa başlatır.
+    interval-minutes: 120
+
+    # Zamanlayıcı tetiklendiğinde, etkinliğin başlayabilmesi için sunucuda
+    # olması gereken minimum oyuncu sayısı.
+    minimum-players: 5
+
+    # Başlatılacak Piñata'nın türü. (Yukarıdaki 'pinata-types' bölümünden bir isim)
+    pinata-type: "default"
+
+  # Sunucudaki oyuncu sayısına ulaşıldığında tetiklenen etkinlikler.
+  player-count:
+    # Bu özelliği aktif eder veya kapatır.
+    enabled: true
+
+    # Sunucudaki oyuncu sayısı bu değere ulaştığında etkinlik tetiklenir.
+    required-players: 20
+
+    # Bu şekilde bir etkinlik başladıktan sonra, tekrar başlayabilmesi için
+    # geçmesi gereken minimum süre (dakika cinsinden). Spam'i önler.
+    cooldown-minutes: 90
+
+    # Başlatılacak Piñata'nın türü.
+    pinata-type: "arena"
+
+# ------------------------------------------------------------------ #
+#                    BenthPinata v1.0.0 by bentahsin                 #
+# ------------------------------------------------------------------ #

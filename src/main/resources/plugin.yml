@@ -1,0 +1,36 @@
+name: BenthPinata
+version: '1.0.0-RELEASE'
+main: com.bentahsin.benthPinata.BenthPinata
+api-version: '1.13'
+author: bentahsin
+depend:
+  - DecentHolograms
+softdepend:
+  - TitleManager
+
+commands:
+  pinata:
+    description: BenthPinata eklentisinin ana komutu.
+    usage: /<command> <start|killall|reload|help>
+    aliases: [pinataevent, pinyata]
+
+permissions:
+  benthpinata.admin:
+    description: Eklentinin tüm komutlarına erişim sağlar.
+    children:
+      - benthpinata.command.start
+      - benthpinata.command.killall
+      - benthpinata.command.reload
+      - benthpinata.command.help
+  benthpinata.command.start:
+    description: /pinata start komutunu kullanma yetkisi.
+    default: op
+  benthpinata.command.killall:
+    description: /pinata killall komutunu kullanma yetkisi.
+    default: op
+  benthpinata.command.reload:
+    description: /pinata reload komutunu kullanma yetkisi.
+    default: op
+  benthpinata.command.help:
+    description: /pinata help komutunu kullanma yetkisi.
+    default: true

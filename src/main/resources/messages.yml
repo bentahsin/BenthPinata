@@ -1,0 +1,50 @@
+# BenthPinata - Mesajlar
+# Eklentideki tüm metinleri buradan düzenleyebilirsiniz.
+
+# Title/Subtitle formatı: 'Başlık;Alt Başlık' şeklinde ; ile ayrılır.
+# Placeholder'lar: %player%, %time%, %health%, %cp_top_name_X%, %cp_top_dmg_X%
+
+# Genel Mesajlar
+no-permission: '&cBu komutu kullanmak için yetkiniz yok.'
+invalid-command-usage: '&cGeçersiz komut. Yardım için /pinata help'
+start-command-usage: '&cKullanım: &7/pinata start <tür_adı>'
+pinata-type-not-found: '&cBelirtilen Piñata türü bulunamadı.'
+killall-success: '&aTüm aktif Piñata''lar ve görevler sonlandırıldı.'
+reload-success: '&aBenthPinata eklentisi başarıyla yeniden yüklendi.'
+
+# Yardım Menüsü
+help-command:
+  - '&e&m-------------------------------------------'
+  - '&6/pinata start <tür> &f- Piñata etkinliğini başlatır.'
+  - '&6/pinata killall &f- Tüm Piñata''ları siler.'
+  - '&6/pinata reload &f- Eklentiyi yeniden yükler.'
+  - '&e&m-------------------------------------------'
+
+# Etkinlik Anonsları
+countdown-started: '&aPiñata Etkinliği Başlıyor!;&eHazır olun!'
+countdown-title: '&6Piñata Doğuyor!;&e%time% saniye kaldı...'
+pinata-spawned: '&d&lPiñata Doğdu!;&fSaldırıya geçin!'
+pinata-death-title: '&c&lPiñata Öldürüldü!;&fÖdüller dağıtılıyor!'
+
+# Oyun İçi Mesajlar
+actionbar-hit: '&eHasar verdin! &f(Toplam: &c%total_damage%&f) &7| &fKalan Can: &c%health%'
+
+# Hologram Ayarları
+hologram:
+  lines:
+    - '&d&lBenthPiñata'
+    - '&fKalan Can: &c%health%&7/&a%max_health%'
+
+# Ölüm Anonsu (Sıralama)
+death-broadcast:
+  - ''
+  - '          &d&lBenthPinata Etkinliği Sona Erdi'
+  - ''
+  - '  &fPiñata öldürüldü! En çok hasar veren kahramanlar:'
+  - ''
+  - '  &6&l1. &e%bp_top_name_1% &7- (&c%bp_top_dmg_1% &7hasar)'
+  - '  &7&l2. &f%bp_top_name_2% &7- (&c%bp_top_dmg_2% &7hasar)'
+  - '  &8&l3. &7%bp_top_name_3% &7- (&c%bp_top_dmg_3% &7hasar)'
+  - ''
+  - '  &aKatılan herkese teşekkürler!'
+  - ''

@@ -1,0 +1,121 @@
+# ------------------------------------------------------------------ #
+#                BenthPinata - Ödül Yapılandırması                   #
+# ------------------------------------------------------------------ #
+#
+# Bu dosyada, Piñata etkinliğine katılan oyunculara verilecek tüm
+# ödülleri yapılandırabilirsiniz. Sistem üç ana kategoriye ayrılır:
+#
+# 1. On-Hit: Piñata'ya her vurulduğunda şansa bağlı verilen küçük ödüller.
+# 2. Damage Thresholds: Bir oyuncu belirli bir hasar eşiğini aştığında
+#    GARANTİ olarak kazandığı tek seferlik ödüller.
+# 3. Final: Etkinlik bittiğinde en çok hasar vuran oyunculara verilen
+#    büyük ödüller.
+#
+#                        ÖNEMLİ BİLGİLER
+#
+# - Komutlar: Tüm komutlar sunucu konsolu tarafından çalıştırılır.
+# - Şans Sistemi (chance): Değerler ağırlıklıdır. Toplamlarının 100
+#   olması gerekmez. Sadece birbirlerine olan oranları önemlidir.
+#   Örn: 80 şanslı bir ödül, 20 şanslı bir ödüle göre 4 kat daha
+#   sık çıkar.
+#
+# - Placeholder'lar:
+#   %player%         -> Ödülü tetikleyen oyuncunun adı.
+#                       (Sadece 'on-hit' ve 'damage-thresholds' için geçerli)
+#   %bp_top_name_X%  -> Sıralamadaki X. oyuncunun adı. (Sadece 'final' için)
+#   %bp_top_dmg_X%   -> Sıralamadaki X. oyuncunun hasarı. (Sadece 'final' için)
+#
+# ------------------------------------------------------------------ #
+
+# ------------------------------------------------------------------ #
+#             Vuruş Başına Ödüller (On-Hit Rewards)
+# ------------------------------------------------------------------ #
+# Açıklama: Bir oyuncu Piñata'ya her vurduğunda, buradaki
+#           ödüllerden birini belirtilen şansa göre kazanabilir.
+#           Oyuncuları aktif tutmak için küçük ve sık ödüller
+#           kullanmak idealdir.
+#
+on-hit:
+  # Ödülün eşsiz ID'si. İstediğiniz gibi isimlendirebilirsiniz.
+  kucuk_para:
+    chance: 5
+    message: '&ePiñata''dan &a100$ &edüştü!'
+    commands:
+      - 'eco give %player% 100'
+
+  nadir_elmas:
+    chance: 1
+    message: '&bVay canına! Piñata''dan bir elmas çıktı!'
+    commands:
+      - 'give %player% diamond 1'
+
+  # İPUCU: Hiçbir şey vermeyen ama şansı yüksek olan bir "boş" ödül
+  # eklemek, ödül çıkma sıklığını dengelemek için harika bir yoldur.
+  bos_odul:
+    chance: 94
+    # Boş ödül için mesaj veya komut yok.
+    # message: ''
+    commands: []
+
+
+# ------------------------------------------------------------------ #
+#                 Hasar Eşiği Ödülleri (Milestones)
+# ------------------------------------------------------------------ #
+# Açıklama: Bir oyuncu, Piñata'ya vurduğu TOPLAM hasarı belirli bir
+#           seviyeye ulaştırdığında bu ödülleri SADECE BİR KEZ kazanır.
+#           Bu ödüller şansa bağlı DEĞİLDİR, garantidir.
+#
+damage-thresholds:
+  # Ödül ID'si: ilk_katilim
+  ilk_katilim:
+    # Bu ödülü kazanmak için gereken toplam hasar.
+    required-damage: 25
+    # Oyuncu bu eşiği geçtiğinde ona özel olarak gönderilecek mesaj.
+    message: '&aTebrikler! Partiye ısındın ve &e25 hasara &aulaştın! İşte küçük bir hediye.'
+    # Verilecek ödül komutları.
+    commands:
+      - 'crate give %player% Etkinlik 1'
+
+  # Ödül ID'si: ciddi_hasar
+  ciddi_hasar:
+    required-damage: 75
+    message: '&6Harikasın! &e75 hasar &6eşigini aştığın için &e10,000$ &6kazandın!'
+    commands:
+      - 'eco give %player% 10000'
+
+
+# ------------------------------------------------------------------ #
+#                       Final Ödülleri (Top Damagers)
+# ------------------------------------------------------------------ #
+# Açıklama: Piñata öldüğünde, en çok hasar vuran oyuncuları ödüllendirir.
+#           Sistem, önce aşağıdaki "ödül setlerinden" birini şansa göre
+#           seçer ve ardından o setin içindeki komutları çalıştırır.
+#           Bu, bazen daha iyi ödüllerin çıkmasını sağlayarak heyecanı artırır!
+#
+final:
+  # Set 1: Standart Ödül Seti (daha yüksek şans)
+  default-set:
+    chance: 80
+    commands:
+      - 'broadcast &ePiñata''nın standart hazinesi ortaya çıktı!'
+      - 'eco give %bp_top_name_1% 100000'
+      - 'give %bp_top_name_1% diamond_block 16'
+      - 'broadcast &6&l%bp_top_name_1% &ePiñata partisi''nin yıldızı oldu ve büyük ödülü kaptı!'
+      - 'eco give %bp_top_name_2% 50000'
+      - 'give %bp_top_name_2% gold_block 16'
+      - 'eco give %bp_top_name_3% 25000'
+      - 'give %bp_top_name_3% emerald_block 16'
+
+  # Set 2: Nadir Ödül Seti (daha düşük şans, daha iyi ödüller)
+  rare-set:
+    chance: 20
+    commands:
+      - 'broadcast &d&lŞANS GÜNÜ! &ePiñata''nın içinden &5&lNADİR &ehazine çıktı!'
+      - 'eco give %bp_top_name_1% 250000'
+      - 'give %bp_top_name_1% nether_star 3'
+      - 'crate give %bp_top_name_1% Efsanevi 1'
+      - 'broadcast &6&l%bp_top_name_1% &ehem partinin yıldızı oldu hem de nadir hazineyi kaptı!'
+      - 'eco give %bp_top_name_2% 100000'
+      - 'give %bp_top_name_2% diamond_block 32'
+      - 'eco give %bp_top_name_3% 50000'
+      - 'give %bp_top_name_3% gold_block 32'

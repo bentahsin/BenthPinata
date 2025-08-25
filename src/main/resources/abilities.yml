@@ -1,0 +1,138 @@
+# ------------------------------------------------------------------ #
+#                BenthPinata - Yetenek Yapılandırması                #
+# ------------------------------------------------------------------ #
+#
+# Bu dosyada, Piñata türlerine özel yetenekler tanımlayabilirsiniz.
+# Bir Piñata'nın canı belirli bir seviyenin altına düştüğünde
+# etrafındaki oyuncuları savurmasını, kör etmesini veya onlara
+# negatif iksir efektleri vermesini sağlayabilirsiniz.
+#
+# ------------------------------------------------------------------ #
+#                      BİR YETENEK NASIL OLUŞTURULUR?
+# ------------------------------------------------------------------ #
+# 1. Piñata Türünü Seçin:
+#    Yetenekleri eklemek istediğiniz Piñata türünün ismini yazın
+#    (config.yml dosyasındaki ile aynı olmalı). Örn: 'default:'
+#
+# 2. Liste Öğesi Ekleyin:
+#    Her yetenek bir liste öğesidir ve tire (-) ile başlar.
+#
+# 3. Parametreleri Doldurun:
+#    Aşağıdaki parametreleri kullanarak yeteneğinizi özelleştirin.
+#    Her parametrenin ne işe yaradığını aşağıdaki açıklamalı bölümden
+#    öğrenebilirsiniz.
+#
+# ------------------------------------------------------------------ #
+#                      TÜM YETENEK PARAMETRELERİ
+# ------------------------------------------------------------------ #
+#
+# type: (Zorunlu) Yeteneğin türünü belirler. Kodun hangi mantığı
+#       çalıştıracağını söyler.
+#       - 'SHOCKWAVE': Oyuncuları Piñata'dan uzağa savurur.
+#       - 'BLINDING_LIGHT': Etki alanındaki oyunculara Körlük efekti verir.
+#       - 'POTION_AURA': Etki alanındaki oyunculara listede belirtilen
+#                        tüm iksir efektlerini uygular.
+#
+# trigger: (Zorunlu) Yeteneğin ne zaman tetikleneceğini belirler.
+#          - 'HEALTH_BELOW': Piñata'nın canı, 'value' ile belirtilen
+#                            yüzdenin altına düştüğünde tetiklenir.
+#
+# value: (Zorunlu) 'trigger' için gerekli olan sayısal değer.
+#        'HEALTH_BELOW' için bu, can yüzdesidir (örn: 75).
+#
+# range: (İsteğe bağlı, varsayılan: 10) Yeteneğin etki edeceği
+#        alanın yarıçapı (blok cinsinden).
+#
+# power: (İsteğe bağlı, varsayılan: 1) Yeteneğin gücü/seviyesi.
+#        - 'SHOCKWAVE' için: Savurma gücü.
+#        - 'POTION_AURA' için: İksir efektinin seviyesi.
+#          ÖNEMLİ: İksir seviyeleri 0'dan başlar!
+#          power: 0 = Seviye I
+#          power: 1 = Seviye II
+#
+# duration: (İsteğe bağlı, varsayılan: 5) İksir efektlerinin
+#           etki süresi (SANİYE cinsinden).
+#
+# message: (İsteğe bağlı) Yetenek tetiklendiğinde sunucuda
+#          yayınlanacak genel anons. Renk kodları (&) kullanabilirsiniz.
+#
+# sound: (İsteğe bağlı) Yetenek kullanıldığında çalınacak ses.
+#        1.12.2 için ses listesi: https://jd.papermc.io/org/bukkit/Sound.html
+#
+# potion-effects: (Sadece 'POTION_AURA' için zorunlu)
+#                 Uygulanacak iksir efektlerinin listesi.
+#                 1.12.2 için efekt listesi: https://jd.papermc.io/org/bukkit/potion/PotionEffectType.html
+#
+# ------------------------------------------------------------------ #
+#                       ÖRNEK YETENEK KULLANIMLARI
+# ------------------------------------------------------------------ #
+#
+# ornek-pinata:
+#   # Örnek 1: Canı %80'in altına düşünce oyuncuları hafifçe geri iter.
+#   - type: 'SHOCKWAVE'
+#     trigger: 'HEALTH_BELOW'
+#     value: 80
+#     power: 1
+#     message: '&ePiñata sinirlendi!'
+#
+#   # Örnek 2: Canı %40'ın altına düşünce 15 bloktaki herkese
+#   # 10 saniyeliğine Seviye II (power: 1) Yavaşlık ve Zayıflık verir.
+#   - type: 'POTION_AURA'
+#     trigger: 'HEALTH_BELOW'
+#     value: 40
+#     range: 15
+#     duration: 10
+#     power: 1
+#     potion-effects:
+#       - 'SLOW'
+#       - 'WEAKNESS'
+#     message: '&8Piñata etrafına lanetli bir aura yaydı!'
+#     sound: 'ENTITY_WITHER_SPAWN'
+#
+# ------------------------------------------------------------------ #
+#                       AKTİF PİÑATA YETENEKLERİ
+# ------------------------------------------------------------------ #
+
+# 'default' -> Bu isim, config.yml dosyasındaki 'pinata-types' altında
+#              tanımladığınız tür ismiyle eşleşmelidir.
+default:
+  # Yetenek 1: Canı %75'in altına düştüğünde tetiklenir.
+  - type: 'SHOCKWAVE'
+    trigger: 'HEALTH_BELOW'
+    value: 75
+    range: 10
+    power: 1
+    message: '&d&lBenthPiñata &cöfkelendi ve bir şok dalgası yaydı!'
+    sound: 'ENTITY_GENERIC_EXPLODE'
+
+  # Yetenek 2: Canı %50'nin altına düştüğünde tetiklenir.
+  - type: 'BLINDING_LIGHT'
+    trigger: 'HEALTH_BELOW'
+    value: 50
+    range: 15
+    duration: 5
+    message: '&d&lBenthPiñata &fkör edici bir ışık saçtı!'
+    sound: 'BLOCK_BEACON_ACTIVATE'
+
+  # Yetenek 3: Canı %25'in altına düştüğünde tetiklenir.
+  - type: 'POTION_AURA'
+    trigger: 'HEALTH_BELOW'
+    value: 25
+    range: 12
+    duration: 8
+    power: 1 # Seviye II (Zayıflık II, Yavaşlık II)
+    # Bu yetenek oyunculara Zayıflık (WEAKNESS) ve Yavaşlık (SLOW) verir.
+    potion-effects:
+      - 'WEAKNESS'
+      - 'SLOW'
+    message: '&d&lBenthPiñata &8zayıflatıcı bir aura yaymaya başladı!'
+    sound: 'ENTITY_WITHER_SPAWN'
+
+# arena:
+#   - type: 'SHOCKWAVE'
+#     trigger: 'HEALTH_BELOW'
+#     value: 50
+#     power: 3 # Çok daha güçlü bir savurma
+#     range: 20
+#     message: '&4&lARENA PİÑATASI GAZABA GELDİ!'
+#     sound: 'ENTITY_WITHER_DEATH'
