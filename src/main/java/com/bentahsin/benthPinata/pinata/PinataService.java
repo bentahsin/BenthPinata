@@ -64,9 +64,6 @@ public class PinataService {
 
     /**
      * Eklenti açılırken veya yeniden yüklenirken config'den tüm Piñata türlerini okur ve belleğe yükler.
-     */
-    /**
-     * Eklenti açılırken veya yeniden yüklenirken config'den tüm Piñata türlerini okur ve belleğe yükler.
      * Bu metot artık daha sağlam ve hata ayıklama için daha fazla bilgi sağlar.
      */
     public void loadPinataTypes() {

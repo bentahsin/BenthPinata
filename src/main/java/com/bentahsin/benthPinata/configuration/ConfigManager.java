@@ -18,11 +18,6 @@ public class ConfigManager {
     private FileConfiguration rewardsConfig;
     private FileConfiguration abilitiesConfig;
 
-    private File mainConfigFile;
-    private File messagesConfigFile;
-    private File rewardsConfigFile;
-    private File abilitiesConfigFile;
-
     public ConfigManager(BenthPinata plugin) {
         this.plugin = plugin;
         setup();
@@ -32,10 +27,10 @@ public class ConfigManager {
      * Gerekli tüm yapılandırma dosyalarını oluşturur ve yükler.
      */
     public void setup() {
-        mainConfigFile = createAndLoadFile("config.yml");
-        messagesConfigFile = createAndLoadFile("messages.yml");
-        rewardsConfigFile = createAndLoadFile("rewards.yml");
-        abilitiesConfigFile = createAndLoadFile("abilities.yml");
+        File mainConfigFile = createAndLoadFile("config.yml");
+        File messagesConfigFile = createAndLoadFile("messages.yml");
+        File rewardsConfigFile = createAndLoadFile("rewards.yml");
+        File abilitiesConfigFile = createAndLoadFile("abilities.yml");
 
         mainConfig = YamlConfiguration.loadConfiguration(mainConfigFile);
         messagesConfig = YamlConfiguration.loadConfiguration(messagesConfigFile);
