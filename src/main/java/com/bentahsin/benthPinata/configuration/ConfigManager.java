@@ -57,16 +57,6 @@ public class ConfigManager {
         return file;
     }
 
-    /**
-     * Tüm yapılandırma dosyalarını diskten yeniden yükler.
-     */
-    public void reload() {
-        mainConfig = YamlConfiguration.loadConfiguration(mainConfigFile);
-        messagesConfig = YamlConfiguration.loadConfiguration(messagesConfigFile);
-        rewardsConfig = YamlConfiguration.loadConfiguration(rewardsConfigFile);
-        abilitiesConfig = YamlConfiguration.loadConfiguration(abilitiesConfigFile);
-    }
-
     // İlgili config nesneleri için getter metotları
     public FileConfiguration getMainConfig() {
         return mainConfig;

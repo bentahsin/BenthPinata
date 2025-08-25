@@ -29,10 +29,12 @@ public class MessageManager {
 
         for (int i = 0; i < placeholders.length; i += 2) {
             if (i + 1 < placeholders.length) {
+                assert message != null;
                 message = message.replace(placeholders[i], placeholders[i + 1]);
             }
         }
 
+        assert message != null;
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 

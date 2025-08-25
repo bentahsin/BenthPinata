@@ -9,6 +9,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,8 +22,8 @@ public class BossBarService {
     public BossBarService(ConfigurationSection config) {
         this.enabled = config.getBoolean("enabled", true);
         try {
-            this.color = BarColor.valueOf(config.getString("color", "PINK").toUpperCase());
-            this.style = BarStyle.valueOf(config.getString("style", "SOLID").toUpperCase());
+            this.color = BarColor.valueOf(Objects.requireNonNull(config.getString("color", "PINK")).toUpperCase());
+            this.style = BarStyle.valueOf(Objects.requireNonNull(config.getString("style", "SOLID")).toUpperCase());
         } catch (IllegalArgumentException e) {
             Bukkit.getLogger().warning("[BenthPinata] BossBar için geçersiz renk veya stil. Varsayılanlar kullanılıyor.");
             throw new RuntimeException(e);

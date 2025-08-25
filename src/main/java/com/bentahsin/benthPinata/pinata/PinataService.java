@@ -184,7 +184,7 @@ public class PinataService {
 
         // Görevin süresi bittiğinde kendini otomatik olarak iptal etmesi için
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (task != null && !task.isCancelled()) {
+            if (!task.isCancelled()) {
                 task.cancel();
                 activeTasks.remove(task);
             }
@@ -261,7 +261,7 @@ public class PinataService {
      */
     private void spawnPinata(PinataType type) {
         Location loc = type.spawnLocation();
-        Sheep sheep = (Sheep) loc.getWorld().spawnEntity(loc, EntityType.SHEEP);
+        Sheep sheep = (Sheep) Objects.requireNonNull(loc.getWorld()).spawnEntity(loc, EntityType.SHEEP);
 
         // Entity ayarları
         sheep.setInvulnerable(false);

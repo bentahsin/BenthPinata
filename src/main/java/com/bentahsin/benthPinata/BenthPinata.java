@@ -16,6 +16,8 @@ import com.bentahsin.benthPinata.services.*;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Objects;
+
 /**
  * BenthPinata eklentisinin ana sınıfı.
  * Eklenti yaşam döngüsünü yönetir, servisleri başlatır ve
@@ -51,7 +53,7 @@ public final class BenthPinata extends JavaPlugin {
         this.hologramService = new HologramService(messageManager);
 
         // 4. BossBar servisini başlat
-        this.bossBarService = new BossBarService(configManager.getMainConfig().getConfigurationSection("boss-bar"));
+        this.bossBarService = new BossBarService(Objects.requireNonNull(configManager.getMainConfig().getConfigurationSection("boss-bar")));
 
         // 5. Diğer servislere bağımlı olan servisleri oluştur
         this.rewardService = new RewardService(configManager, placeholderService);
@@ -106,7 +108,7 @@ public final class BenthPinata extends JavaPlugin {
         this.placeholderService = new PlaceholderService();
         this.effectService = new EffectService(configManager);
         this.hologramService = new HologramService(messageManager);
-        this.bossBarService = new BossBarService(configManager.getMainConfig().getConfigurationSection("boss-bar"));
+        this.bossBarService = new BossBarService(Objects.requireNonNull(configManager.getMainConfig().getConfigurationSection("boss-bar")));
         this.rewardService = new RewardService(configManager, placeholderService);
         this.abilityService = new AbilityService(effectService);
         this.pinataRepository = new PinataRepository();
@@ -141,8 +143,8 @@ public final class BenthPinata extends JavaPlugin {
         commandManager.registerCommand(new PinataReloadCommand(this));
         commandManager.registerCommand(new PinataKillAllCommand(this.pinataService, this.messageManager));
         commandManager.registerCommand(new PinataHelpCommand(this.messageManager));
-        getCommand("pinata").setExecutor(commandManager);
-        getCommand("pinata").setTabCompleter(new TabCompleter(this.pinataService));
+        Objects.requireNonNull(getCommand("pinata")).setExecutor(commandManager);
+        Objects.requireNonNull(getCommand("pinata")).setTabCompleter(new TabCompleter(this.pinataService));
 
         // Listener'ları Kaydet
         getServer().getPluginManager().registerEvents(new PinataInteractionListener(this.pinataRepository, this.pinataService, this.bossBarService), this);
@@ -160,15 +162,6 @@ public final class BenthPinata extends JavaPlugin {
     }
 
     public ConfigManager getConfigManager() { return configManager; }
-    public SettingsManager getSettingsManager() { return settingsManager; }
     public MessageManager getMessageManager() { return messageManager; }
-    public PinataService getPinataService() { return pinataService; }
     public PinataRepository getPinataRepository() { return pinataRepository; }
-    public PlaceholderService getPlaceholderService() { return placeholderService; }
-    public BossBarService getBossBarService() { return bossBarService; }
-    public AbilityService getAbilityService() { return abilityService; }
-    public EventManager getEventManager() { return eventManager; }
-    public HologramService getHologramService() { return hologramService; }
-    public EffectService getEffectService() { return effectService; }
-    public RewardService getRewardService() { return rewardService; }
 }

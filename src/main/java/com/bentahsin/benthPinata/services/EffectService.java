@@ -6,6 +6,8 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 
+import java.util.Objects;
+
 /**
  * Eklenti içindeki tüm ses ve partikül efektlerini yönetir.
  */
@@ -25,8 +27,9 @@ public class EffectService {
     public void playSoundForAll(String soundPath, Location location) {
         try {
             String soundName = configManager.getMainConfig().getString("sounds." + soundPath);
+            assert soundName != null;
             Sound sound = Sound.valueOf(soundName.toUpperCase());
-            location.getWorld().playSound(location, sound, 1.0f, 1.0f);
+            Objects.requireNonNull(location.getWorld()).playSound(location, sound, 1.0f, 1.0f);
         } catch (Exception e) {
             Bukkit.getLogger().warning("[BenthPinata] 'sounds." + soundPath + "' yolundaki ses geçersiz.");
         }
@@ -40,8 +43,9 @@ public class EffectService {
     public void spawnParticle(String particlePath, Location location) {
         try {
             String particleName = configManager.getMainConfig().getString("effects." + particlePath);
+            assert particleName != null;
             Particle particle = Particle.valueOf(particleName.toUpperCase());
-            location.getWorld().spawnParticle(particle, location, 30, 0.5, 0.5, 0.5, 0.05);
+            Objects.requireNonNull(location.getWorld()).spawnParticle(particle, location, 30, 0.5, 0.5, 0.5, 0.05);
         } catch (Exception e) {
             Bukkit.getLogger().warning("[BenthPinata] 'effects." + particlePath + "' yolundaki partikül geçersiz.");
         }
