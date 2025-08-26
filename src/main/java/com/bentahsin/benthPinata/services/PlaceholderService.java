@@ -26,7 +26,7 @@ public class PlaceholderService {
             String type = matcher.group(1);
             int rank = Integer.parseInt(matcher.group(2));
 
-            String replacement
+            String replacement;
             if (rank > 0 && rank <= sortedDamagers.size()) {
                 Map.Entry<UUID, Integer> entry = sortedDamagers.get(rank - 1);
                 if ("name".equals(type)) {
