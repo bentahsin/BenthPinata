@@ -98,7 +98,6 @@ public final class BenthPinata extends JavaPlugin {
         // 8. Eklenti başlarken Piñata türlerini config'den yükle
         this.pinataService.loadPinataTypes();
 
-        // YENİ: PlaceholderAPI kaydını buraya taşı
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new BenthPinataExpansion(this.playerStatsService, this.statsLeaderboardService).register();
             getLogger().info("PlaceholderAPI desteği başarıyla aktif edildi.");

@@ -46,7 +46,7 @@ public class PinataService {
 
     private final Map<String, PinataType> loadedPinataTypes = new HashMap<>();
     private final List<BukkitTask> activeTasks = new ArrayList<>();
-    private final Map<UUID, Long> playerCooldowns = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> playerCooldowns = new HashMap<>();
 
     public PinataService(BenthPinata plugin, SettingsManager settingsManager, MessageManager messageManager,
                          PinataRepository pinataRepository, HologramService hologramService,
@@ -183,7 +183,6 @@ public class PinataService {
             remainingTime[0]--;
         }, 0L, 20L);
 
-        // Görevin süresi bittiğinde kendini otomatik olarak iptal etmesi için
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (!task.isCancelled()) {
                 task.cancel();
@@ -206,11 +205,12 @@ public class PinataService {
         if (now < cooldownEnd) return;
         playerCooldowns.put(damager.getUniqueId(), now + settingsManager.getHitCooldownMillis());
 
+        if (pinata.isDying()) return;
+
         boolean isDead = pinata.applyDamage(damager, 1);
 
         playerStatsService.addDamage(damager, 1);
 
-        // Hasar sonrası tüm servisleri bilgilendir
         abilityService.tryTriggerAbilities(pinata);
         bossBarService.updateProgress(pinata);
         hologramService.updateHologramFor(pinata);
@@ -226,6 +226,7 @@ public class PinataService {
         rewardService.checkAndGrantThresholdRewards(damager, pinata);
 
         if (isDead) {
+            pinata.setDying(true);
             handleDeath(pinata);
         }
     }
@@ -234,15 +235,12 @@ public class PinataService {
      * Tüm aktif Piñata'ları ve ilgili görevleri sonlandırır.
      */
     public void killAll() {
-        // Aktif görevleri iptal et ve listeyi temizle
         new ArrayList<>(activeTasks).forEach(BukkitTask::cancel);
         activeTasks.clear();
 
-        // Aktif Piñata'ları sil
         new ArrayList<>(pinataRepository.findAll()).forEach(this::cleanupPinata);
         pinataRepository.clear();
 
-        // Bu, bir sonraki etkinliğin temiz başlamasını garantiler.
         playerCooldowns.clear();
     }
 
@@ -282,16 +280,11 @@ public class PinataService {
         broadcastTitle("pinata-spawned");
         effectService.playSoundForAll("spawn", sheep.getLocation());
 
-        // Kendi kendini iptal edebilen bir task oluşturmak için referans tutucu
-        final BukkitTask[] updateTaskHolder = new BukkitTask[1];
-
         BukkitTask updateTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            // Eğer Piñata entity'si artık geçerli değilse...
             if (!pinata.getEntity().isValid()) {
-                // Görevin kendisini güvenli bir şekilde iptal et.
-                if (updateTaskHolder[0] != null) {
-                    updateTaskHolder[0].cancel();
-                    activeTasks.remove(updateTaskHolder[0]);
+                if (pinata.getUpdateTask() != null && !pinata.getUpdateTask().isCancelled()) {
+                    pinata.getUpdateTask().cancel();
+                    activeTasks.remove(pinata.getUpdateTask());
                 }
                 return;
             }
@@ -313,8 +306,6 @@ public class PinataService {
 
         }, 20L, 40L);
 
-        // Task referansını hem tutucuya hem de Piñata nesnesine ata
-        updateTaskHolder[0] = updateTask;
         pinata.setUpdateTask(updateTask);
         activeTasks.add(updateTask);
     }

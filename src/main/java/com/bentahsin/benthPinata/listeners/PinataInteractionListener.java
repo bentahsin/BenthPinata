@@ -36,7 +36,6 @@ public class PinataInteractionListener implements Listener {
             event.setCancelled(true);
         }
 
-        // "Eğer vuran bir Player ise (adı damager olsun) VE vurulan bir Pinata ise..."
         if (event.getDamager() instanceof Player damager && pinataOpt.isPresent()) {
             Pinata pinata = pinataOpt.get();
             pinataService.handleDamage(damager, pinata);
@@ -45,17 +44,12 @@ public class PinataInteractionListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPinataEnvironmentDamage(EntityDamageEvent event) {
-        // Eğer bu hasar zaten yukarıdaki metot tarafından yönetiliyorsa (yani bir oyuncu vuruşuysa),
-        // bu metodun bir şey yapmasına gerek yok. O yüzden bu tür olayları atlıyoruz.
         if (event instanceof EntityDamageByEntityEvent) {
             return;
         }
 
-        // Hasar alan varlığın bir Piñata olup olmadığını kontrol et.
         Optional<Pinata> pinataOpt = pinataRepository.findByEntity(event.getEntity());
 
-        // Eğer hasar alan bir Piñata ise ve hasarın nedeni oyuncu vuruşu değilse
-        // (düşme, boğulma, yanma vb.), olayı iptal et.
         if (pinataOpt.isPresent()) {
             event.setCancelled(true);
         }

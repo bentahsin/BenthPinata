@@ -6,7 +6,7 @@ import com.bentahsin.benthPinata.configuration.MessageManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter; // Ekle
+import org.bukkit.command.TabCompleter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -31,7 +31,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        // ... (Bu metot aynı kalıyor, değişiklik yok)
         if (args.length == 0) {
             ISubCommand helpCommand = subCommands.get("help");
             if (helpCommand != null) {

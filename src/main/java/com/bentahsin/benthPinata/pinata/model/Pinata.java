@@ -19,7 +19,7 @@ public class Pinata {
     private final UUID uniqueId;
     private final PinataType type;
     private final Sheep entity;
-    private Hologram hologram; // HologramService tarafından atanacak
+    private Hologram hologram;
     private BukkitTask updateTask;
     private int currentHealth;
     private final Map<UUID, Integer> damagers;
@@ -44,6 +44,16 @@ public class Pinata {
         this.currentHealth -= amount;
         damagers.merge(player.getUniqueId(), amount, Integer::sum);
         return this.currentHealth <= 0;
+    }
+
+    private boolean isDying = false;
+
+    public boolean isDying() {
+        return isDying;
+    }
+
+    public void setDying(boolean dying) {
+        isDying = dying;
     }
 
     /**

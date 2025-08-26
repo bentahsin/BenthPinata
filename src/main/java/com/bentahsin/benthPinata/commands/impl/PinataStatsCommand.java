@@ -34,7 +34,7 @@ public class PinataStatsCommand implements ISubCommand {
 
     @Override
     public String getPermission() {
-        return "benthpinata.stats"; // Ana stats komutu için yetki
+        return "benthpinata.stats";
     }
 
     @Override
@@ -53,7 +53,7 @@ public class PinataStatsCommand implements ISubCommand {
                         messageManager.sendMessage(sender, "no-permission");
                         return;
                     }
-                    resetCommand.execute(sender, args); // resetCommand nesnesini ekleyeceğiz
+                    resetCommand.execute(sender, args);
                     return;
             }
         }

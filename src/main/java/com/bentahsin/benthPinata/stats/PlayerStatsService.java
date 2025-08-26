@@ -49,11 +49,15 @@ public class PlayerStatsService {
             return;
         }
         Objects.requireNonNull(statsConfig.getConfigurationSection("stats")).getKeys(false).forEach(uuidString -> {
-            UUID playerId = UUID.fromString(uuidString);
-            PlayerStats stats = new PlayerStats(playerId);
-            stats.setTotalDamage(statsConfig.getInt("stats." + uuidString + ".totalDamage"));
-            stats.setPinataKills(statsConfig.getInt("stats." + uuidString + ".pinataKills"));
-            statsMap.put(playerId, stats);
+            try {
+                UUID playerId = UUID.fromString(uuidString);
+                PlayerStats stats = new PlayerStats(playerId);
+                stats.setTotalDamage(statsConfig.getInt("stats." + uuidString + ".totalDamage"));
+                stats.setPinataKills(statsConfig.getInt("stats." + uuidString + ".pinataKills"));
+                statsMap.put(playerId, stats);
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("stats.yml içinde geçersiz UUID formatı bulundu ve atlandı: " + uuidString);
+            }
         });
         plugin.getLogger().info("Oyuncu istatistikleri yüklendi.");
     }

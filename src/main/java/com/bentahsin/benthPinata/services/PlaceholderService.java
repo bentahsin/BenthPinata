@@ -23,16 +23,16 @@ public class PlaceholderService {
         StringBuilder sb = new StringBuilder();
 
         while (matcher.find()) {
-            String type = matcher.group(1); // "name" veya "dmg"
-            int rank = Integer.parseInt(matcher.group(2)); // 1, 2, 3...
+            String type = matcher.group(1);
+            int rank = Integer.parseInt(matcher.group(2));
 
-            String replacement; // Değeri başta atama
+            String replacement
             if (rank > 0 && rank <= sortedDamagers.size()) {
                 Map.Entry<UUID, Integer> entry = sortedDamagers.get(rank - 1);
                 if ("name".equals(type)) {
                     OfflinePlayer player = Bukkit.getOfflinePlayer(entry.getKey());
                     replacement = player.getName() != null ? player.getName() : "Bilinmiyor";
-                } else { // "dmg"
+                } else {
                     replacement = entry.getValue().toString();
                 }
             } else {
