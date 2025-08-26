@@ -5,6 +5,8 @@ import com.bentahsin.benthPinata.configuration.MessageManager;
 import com.bentahsin.benthPinata.pinata.PinataService;
 import org.bukkit.command.CommandSender;
 
+import java.util.List;
+
 /**
  * Aktif olan tüm Piñata'ları ve ilişkili görevleri sonlandıran alt komut.
  */
@@ -32,5 +34,10 @@ public class PinataKillAllCommand implements ISubCommand {
     public void execute(CommandSender sender, String[] args) {
         pinataService.killAll();
         messageManager.sendMessage(sender, "killall-success");
+    }
+
+    @Override
+    public List<String> tabComplete(CommandSender sender, String[] args) {
+        return List.of();
     }
 }

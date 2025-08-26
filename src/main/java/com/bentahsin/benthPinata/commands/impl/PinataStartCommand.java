@@ -5,6 +5,8 @@ import com.bentahsin.benthPinata.configuration.MessageManager;
 import com.bentahsin.benthPinata.pinata.PinataService;
 import org.bukkit.command.CommandSender;
 
+import java.util.List;
+
 public class PinataStartCommand implements ISubCommand {
 
     private final PinataService pinataService;
@@ -38,5 +40,10 @@ public class PinataStartCommand implements ISubCommand {
         if (!success) {
             messageManager.sendMessage(sender, "pinata-type-not-found");
         }
+    }
+
+    @Override
+    public List<String> tabComplete(CommandSender sender, String[] args) {
+        return List.of();
     }
 }

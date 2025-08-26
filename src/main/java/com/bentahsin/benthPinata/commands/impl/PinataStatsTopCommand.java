@@ -5,7 +5,6 @@ import com.bentahsin.benthPinata.stats.PlayerStats;
 import com.bentahsin.benthPinata.stats.StatsLeaderboardService;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.UUID;

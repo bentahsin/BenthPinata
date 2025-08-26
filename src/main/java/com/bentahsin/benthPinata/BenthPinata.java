@@ -94,7 +94,8 @@ public final class BenthPinata extends JavaPlugin {
                 rewardService,
                 placeholderService,
                 bossBarService,
-                abilityService
+                abilityService,
+                playerStatsService  
         );
 
         // 7. EventManager'ı, pinataService oluşturulduktan sonra başlat

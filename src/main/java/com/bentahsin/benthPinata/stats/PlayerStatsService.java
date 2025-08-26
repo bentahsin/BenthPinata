@@ -7,23 +7,27 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerStatsService {
     private final Map<UUID, PlayerStats> statsMap = new ConcurrentHashMap<>();
     private final JavaPlugin plugin;
     private final File statsFile;
-    private FileConfiguration statsConfig;
+    private final FileConfiguration statsConfig;
 
     public PlayerStatsService(JavaPlugin plugin) {
         this.plugin = plugin;
         this.statsFile = new File(plugin.getDataFolder(), "stats.yml");
         if (!statsFile.exists()) {
-            plugin.saveResource("stats.yml", false);
+            try {
+                if (statsFile.createNewFile()) {
+                    plugin.getLogger().info("stats.yml dosyası oluşturuldu.");
+                }
+            } catch (IOException e) {
+                plugin.getLogger().severe("stats.yml dosyası oluşturulamadı: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
         this.statsConfig = YamlConfiguration.loadConfiguration(statsFile);
     }
@@ -44,7 +48,7 @@ public class PlayerStatsService {
         if (statsConfig.getConfigurationSection("stats") == null) {
             return;
         }
-        statsConfig.getConfigurationSection("stats").getKeys(false).forEach(uuidString -> {
+        Objects.requireNonNull(statsConfig.getConfigurationSection("stats")).getKeys(false).forEach(uuidString -> {
             UUID playerId = UUID.fromString(uuidString);
             PlayerStats stats = new PlayerStats(playerId);
             stats.setTotalDamage(statsConfig.getInt("stats." + uuidString + ".totalDamage"));
@@ -75,9 +79,13 @@ public class PlayerStatsService {
 
     public void resetPlayerStats(UUID playerId) {
         statsMap.remove(playerId);
-        // Dosyadan da silelim
         statsConfig.set("stats." + playerId.toString(), null);
-        saveStats();
+        try {
+            statsConfig.save(statsFile);
+        } catch (IOException e) {
+            plugin.getLogger().severe("İstatistikler dosyaya kaydedilemedi: " + statsFile.getName());
+            e.printStackTrace();
+        }
     }
 
     public void resetAllStats() {

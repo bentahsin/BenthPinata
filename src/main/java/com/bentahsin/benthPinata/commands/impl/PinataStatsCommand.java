@@ -75,7 +75,7 @@ public class PinataStatsCommand implements ISubCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
         if (args.length == 1 && sender.hasPermission("benthpinata.stats.top")) {
-            return Arrays.asList("top");
+            return List.of("top");
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("top") && sender.hasPermission("benthpinata.stats.top")) {
             return Arrays.asList("damage", "kills");

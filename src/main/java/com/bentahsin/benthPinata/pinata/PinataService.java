@@ -7,6 +7,7 @@ import com.bentahsin.benthPinata.pinata.model.Pinata;
 import com.bentahsin.benthPinata.pinata.model.PinataAbility;
 import com.bentahsin.benthPinata.pinata.model.PinataType;
 import com.bentahsin.benthPinata.services.*;
+import com.bentahsin.benthPinata.stats.PlayerStatsService;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -41,6 +42,7 @@ public class PinataService {
     private final PlaceholderService placeholderService;
     private final BossBarService bossBarService;
     private final AbilityService abilityService;
+    private final PlayerStatsService playerStatsService;
 
     private final Map<String, PinataType> loadedPinataTypes = new HashMap<>();
     private final List<BukkitTask> activeTasks = new ArrayList<>();
@@ -49,7 +51,8 @@ public class PinataService {
     public PinataService(BenthPinata plugin, SettingsManager settingsManager, MessageManager messageManager,
                          PinataRepository pinataRepository, HologramService hologramService,
                          EffectService effectService, RewardService rewardService, PlaceholderService placeholderService,
-                         BossBarService bossBarService, AbilityService abilityService) {
+                         BossBarService bossBarService, AbilityService abilityService,
+                         PlayerStatsService playerStatsService) {
         this.plugin = plugin;
         this.settingsManager = settingsManager;
         this.messageManager = messageManager;
@@ -60,6 +63,7 @@ public class PinataService {
         this.placeholderService = placeholderService;
         this.bossBarService = bossBarService;
         this.abilityService = abilityService;
+        this.playerStatsService = playerStatsService;
     }
 
     /**
@@ -204,6 +208,8 @@ public class PinataService {
 
         boolean isDead = pinata.applyDamage(damager, 1);
 
+        playerStatsService.addDamage(damager, 1);
+
         // Hasar sonrası tüm servisleri bilgilendir
         abilityService.tryTriggerAbilities(pinata);
         bossBarService.updateProgress(pinata);
@@ -324,6 +330,15 @@ public class PinataService {
 
         // Broadcast mesajları için placeholder'ları doldurup gönder
         List<Map.Entry<UUID, Integer>> sortedDamagers = pinata.getSortedDamagers();
+
+        if (!sortedDamagers.isEmpty()) {
+            UUID topDamagerId = sortedDamagers.get(0).getKey();
+            Player topDamager = Bukkit.getPlayer(topDamagerId);
+            if (topDamager != null && topDamager.isOnline()) {
+                playerStatsService.addKill(topDamager);
+            }
+        }
+
         messageManager.getMessageList("death-broadcast").forEach(line -> {
             String processedLine = placeholderService.parseTopDamagers(line, sortedDamagers);
             Bukkit.broadcastMessage(processedLine);

@@ -4,6 +4,8 @@ import com.bentahsin.benthPinata.commands.ISubCommand;
 import com.bentahsin.benthPinata.configuration.MessageManager;
 import org.bukkit.command.CommandSender;
 
+import java.util.List;
+
 /**
  * Oyunculara yardım menüsünü gösteren alt komut.
  */
@@ -28,5 +30,10 @@ public class PinataHelpCommand implements ISubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         messageManager.sendMessageList(sender, "help-command");
+    }
+
+    @Override
+    public List<String> tabComplete(CommandSender sender, String[] args) {
+        return List.of();
     }
 }
