@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 public class PlayerStatsService {
     private final Map<UUID, PlayerStats> statsMap = new ConcurrentHashMap<>();
@@ -25,8 +26,7 @@ public class PlayerStatsService {
                     plugin.getLogger().info("stats.yml dosyası oluşturuldu.");
                 }
             } catch (IOException e) {
-                plugin.getLogger().severe("stats.yml dosyası oluşturulamadı: " + e.getMessage());
-                e.printStackTrace();
+                plugin.getLogger().log(Level.SEVERE, "stats.yml dosyası oluşturulamadı!", e);
             }
         }
         this.statsConfig = YamlConfiguration.loadConfiguration(statsFile);
@@ -68,8 +68,7 @@ public class PlayerStatsService {
             statsConfig.save(statsFile);
             plugin.getLogger().info("Oyuncu istatistikleri kaydedildi.");
         } catch (IOException e) {
-            plugin.getLogger().severe("İstatistikler dosyaya kaydedilemedi: " + statsFile.getName());
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "İstatistikler dosyaya kaydedilemedi: " + statsFile.getName(), e);
         }
     }
 
@@ -77,15 +76,14 @@ public class PlayerStatsService {
         return new ArrayList<>(statsMap.values());
     }
 
+    /**
+     * İYİLEŞTİRME: Bu metot artık kod tekrarı yapmak yerine merkezi saveStats() metodunu çağırıyor.
+     * Bu, hem kodu temizler hem de üçüncü uyarıyı ortadan kaldırır.
+     */
     public void resetPlayerStats(UUID playerId) {
         statsMap.remove(playerId);
         statsConfig.set("stats." + playerId.toString(), null);
-        try {
-            statsConfig.save(statsFile);
-        } catch (IOException e) {
-            plugin.getLogger().severe("İstatistikler dosyaya kaydedilemedi: " + statsFile.getName());
-            e.printStackTrace();
-        }
+        saveStats();
     }
 
     public void resetAllStats() {

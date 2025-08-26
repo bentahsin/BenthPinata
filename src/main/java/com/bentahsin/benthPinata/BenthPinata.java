@@ -25,14 +25,8 @@ import java.util.Objects;
 public final class BenthPinata extends JavaPlugin {
 
     private ConfigManager configManager;
-    private SettingsManager settingsManager;
     private MessageManager messageManager;
-    private HologramService hologramService;
-    private EffectService effectService;
-    private RewardService rewardService;
-    private PlaceholderService placeholderService;
     private BossBarService bossBarService;
-    private AbilityService abilityService;
     private PinataRepository pinataRepository;
     private PinataService pinataService;
     private EventManager eventManager;
@@ -63,20 +57,20 @@ public final class BenthPinata extends JavaPlugin {
         this.configManager.setup();
 
         // 2. Ayar ve Mesaj yöneticilerini, konfigürasyon yöneticisine bağla
-        this.settingsManager = new SettingsManager(configManager);
+        SettingsManager settingsManager = new SettingsManager(configManager);
         this.messageManager = new MessageManager(configManager);
 
         // 3. Bağımsız servisleri oluştur
-        this.placeholderService = new PlaceholderService();
-        this.effectService = new EffectService(configManager);
-        this.hologramService = new HologramService(messageManager);
+        PlaceholderService placeholderService = new PlaceholderService();
+        EffectService effectService = new EffectService(configManager);
+        HologramService hologramService = new HologramService(messageManager);
 
         // 4. BossBar servisini başlat
         this.bossBarService = new BossBarService(Objects.requireNonNull(configManager.getMainConfig().getConfigurationSection("boss-bar")));
 
         // 5. Diğer servislere bağımlı olan servisleri oluştur
-        this.rewardService = new RewardService(configManager, placeholderService);
-        this.abilityService = new AbilityService(effectService);
+        RewardService rewardService = new RewardService(configManager, placeholderService);
+        AbilityService abilityService = new AbilityService(effectService);
         this.playerStatsService = new PlayerStatsService(this);
         this.playerStatsService.loadStats();
         this.statsLeaderboardService = new StatsLeaderboardService(this, this.playerStatsService);
