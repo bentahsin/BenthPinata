@@ -4,6 +4,7 @@ import com.bentahsin.benthPinata.BenthPinata;
 import com.bentahsin.benthPinata.commands.ISubCommand;
 import org.bukkit.command.CommandSender;
 
+import java.util.Collections;
 import java.util.List;
 
 public class PinataReloadCommand implements ISubCommand {
@@ -27,6 +28,6 @@ public class PinataReloadCommand implements ISubCommand {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
-        return List.of();
+        return Collections.emptyList();
     }
 }

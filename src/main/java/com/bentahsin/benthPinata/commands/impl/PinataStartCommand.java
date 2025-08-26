@@ -5,7 +5,9 @@ import com.bentahsin.benthPinata.configuration.MessageManager;
 import com.bentahsin.benthPinata.pinata.PinataService;
 import org.bukkit.command.CommandSender;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PinataStartCommand implements ISubCommand {
 
@@ -44,6 +46,12 @@ public class PinataStartCommand implements ISubCommand {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
-        return List.of();
+        if (args.length == 1) {
+            String currentArg = args[0].toLowerCase();
+            return pinataService.getLoadedTypeIds().stream()
+                    .filter(type -> type.toLowerCase().startsWith(currentArg))
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 }

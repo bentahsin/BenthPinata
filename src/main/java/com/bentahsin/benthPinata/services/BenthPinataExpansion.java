@@ -9,6 +9,7 @@ import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 
 public class BenthPinataExpansion extends PlaceholderExpansion {
 
@@ -37,7 +38,7 @@ public class BenthPinataExpansion extends PlaceholderExpansion {
         // %benthpinata_stats_damage% ve %benthpinata_stats_kills%
         if (params.startsWith("stats_")) {
             if (player == null) return "0";
-            PlayerStats stats = playerStatsService.getStats(player.getPlayer());
+            PlayerStats stats = playerStatsService.getStats(Objects.requireNonNull(player.getPlayer()));
             if (params.equalsIgnoreCase("stats_damage")) {
                 return String.valueOf(stats.getTotalDamage());
             }

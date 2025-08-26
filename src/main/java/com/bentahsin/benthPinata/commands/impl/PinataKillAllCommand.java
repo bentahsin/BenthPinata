@@ -5,6 +5,7 @@ import com.bentahsin.benthPinata.configuration.MessageManager;
 import com.bentahsin.benthPinata.pinata.PinataService;
 import org.bukkit.command.CommandSender;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,6 +39,6 @@ public class PinataKillAllCommand implements ISubCommand {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
-        return List.of();
+        return Collections.emptyList();
     }
 }

@@ -1,7 +1,6 @@
 package com.bentahsin.benthPinata;
 
 import com.bentahsin.benthPinata.commands.CommandManager;
-import com.bentahsin.benthPinata.commands.TabCompleter;
 import com.bentahsin.benthPinata.commands.impl.*;
 import com.bentahsin.benthPinata.configuration.ConfigManager;
 import com.bentahsin.benthPinata.configuration.MessageManager;
@@ -95,7 +94,7 @@ public final class BenthPinata extends JavaPlugin {
                 placeholderService,
                 bossBarService,
                 abilityService,
-                playerStatsService  
+                playerStatsService
         );
 
         // 7. EventManager'ı, pinataService oluşturulduktan sonra başlat
@@ -138,8 +137,9 @@ public final class BenthPinata extends JavaPlugin {
         commandManager.registerCommand(new PinataKillAllCommand(this.pinataService, this.messageManager));
         commandManager.registerCommand(new PinataHelpCommand(this.messageManager));
         commandManager.registerCommand(new PinataStatsCommand(this.playerStatsService, this.messageManager, this.statsLeaderboardService));
+
         Objects.requireNonNull(getCommand("pinata")).setExecutor(commandManager);
-        Objects.requireNonNull(getCommand("pinata")).setTabCompleter(new TabCompleter(this.pinataService));
+        Objects.requireNonNull(getCommand("pinata")).setTabCompleter(commandManager);
 
         // Listener'ları Kaydet
         getServer().getPluginManager().registerEvents(new PinataInteractionListener(this.pinataRepository, this.pinataService, this.bossBarService), this);
