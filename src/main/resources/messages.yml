@@ -48,3 +48,35 @@ death-broadcast:
   - ''
   - '  &aKatılan herkese teşekkürler!'
   - ''
+
+# İstatistikler
+stats:
+  header:
+    - "&e&m----------------------------------"
+    - "&6&lPiñata İstatistiklerin"
+    - ""
+  total-damage: "&eToplam Hasar: &f%damage%"
+  pinata-kills: "&eÖldürülen Piñata: &f%kills%"
+  footer:
+    - ""
+    - "&e&m----------------------------------"
+  leaderboard:
+    usage: '&cKullanım: /pinata stats top <damage|kills>'
+    empty: '&cGösterilecek istatistik verisi bulunamadı.'
+    header-damage:
+      - '&e&m----------------------------------'
+      - '&6&lEn Çok Hasar Verenler'
+      - ''
+    header-kills:
+      - '&e&m----------------------------------'
+      - '&6&lEn Çok Piñata Öldürenler'
+      - ''
+    format: '&e#%rank% &f%player% &7- &c%value%'
+    footer:
+      - ''
+      - '&e&m----------------------------------'
+  reset:
+    usage: '&cKullanım: /pinata stats reset <oyuncu_adı|all>'
+    player-not-found: '&cOyuncu bulunamadı: %player%'
+    player-success: '&a%player% adlı oyuncunun istatistikleri sıfırlandı.'
+    all-success: '&aTüm oyuncu istatistikleri başarıyla sıfırlandı.'

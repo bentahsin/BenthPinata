@@ -2,10 +2,7 @@ package com.bentahsin.benthPinata;
 
 import com.bentahsin.benthPinata.commands.CommandManager;
 import com.bentahsin.benthPinata.commands.TabCompleter;
-import com.bentahsin.benthPinata.commands.impl.PinataHelpCommand;
-import com.bentahsin.benthPinata.commands.impl.PinataKillAllCommand;
-import com.bentahsin.benthPinata.commands.impl.PinataReloadCommand;
-import com.bentahsin.benthPinata.commands.impl.PinataStartCommand;
+import com.bentahsin.benthPinata.commands.impl.*;
 import com.bentahsin.benthPinata.configuration.ConfigManager;
 import com.bentahsin.benthPinata.configuration.MessageManager;
 import com.bentahsin.benthPinata.configuration.SettingsManager;
@@ -13,6 +10,9 @@ import com.bentahsin.benthPinata.listeners.PinataInteractionListener;
 import com.bentahsin.benthPinata.pinata.PinataRepository;
 import com.bentahsin.benthPinata.pinata.PinataService;
 import com.bentahsin.benthPinata.services.*;
+import com.bentahsin.benthPinata.stats.PlayerStatsService;
+import com.bentahsin.benthPinata.stats.StatsLeaderboardService;
+import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,11 +37,31 @@ public final class BenthPinata extends JavaPlugin {
     private PinataRepository pinataRepository;
     private PinataService pinataService;
     private EventManager eventManager;
+    private PlayerStatsService playerStatsService;
+    private StatsLeaderboardService statsLeaderboardService;
 
     @Override
     public void onEnable() {
+        startup();
+    }
+
+    @Override
+    public void onDisable() {
+        if (this.playerStatsService != null) {
+            this.playerStatsService.saveStats();
+        }
+        shutdown();
+        getLogger().info("BenthPinata eklentisi devre dışı bırakıldı.");
+    }
+
+    /**
+     * Eklentiyi başlatan veya yeniden yükleyen ana mantık.
+     * Tüm servisleri oluşturur ve olay dinleyicilerini kaydeder.
+     */
+    public void startup() {
         // 1. Konfigürasyon yöneticisini başlat
         this.configManager = new ConfigManager(this);
+        this.configManager.setup();
 
         // 2. Ayar ve Mesaj yöneticilerini, konfigürasyon yöneticisine bağla
         this.settingsManager = new SettingsManager(configManager);
@@ -58,6 +78,9 @@ public final class BenthPinata extends JavaPlugin {
         // 5. Diğer servislere bağımlı olan servisleri oluştur
         this.rewardService = new RewardService(configManager, placeholderService);
         this.abilityService = new AbilityService(effectService);
+        this.playerStatsService = new PlayerStatsService(this);
+        this.playerStatsService.loadStats();
+        this.statsLeaderboardService = new StatsLeaderboardService(this, this.playerStatsService);
 
         // 6. Depo ve Ana Servis katmanlarını oluştur
         this.pinataRepository = new PinataRepository();
@@ -81,46 +104,16 @@ public final class BenthPinata extends JavaPlugin {
         // 8. Eklenti başlarken Piñata türlerini config'den yükle
         this.pinataService.loadPinataTypes();
 
+        // YENİ: PlaceholderAPI kaydını buraya taşı
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new BenthPinataExpansion(this.playerStatsService, this.statsLeaderboardService).register();
+            getLogger().info("PlaceholderAPI desteği başarıyla aktif edildi.");
+        }
+
         // 9. Komutları ve Listener'ları kaydet
-        startup();
+        registerHandlers();
 
         getLogger().info("BenthPinata eklentisi yeni mimari ile başarıyla başlatıldı!");
-    }
-
-    @Override
-    public void onDisable() {
-        shutdown();
-        getLogger().info("BenthPinata eklentisi devre dışı bırakıldı.");
-    }
-
-    /**
-     * Eklentiyi başlatan veya yeniden yükleyen ana mantık.
-     * Tüm servisleri oluşturur ve olay dinleyicilerini kaydeder.
-     */
-    public void startup() {
-        // 1. Konfigürasyon yöneticisini başlat
-        this.configManager = new ConfigManager(this);
-        this.configManager.setup();
-
-        // 2. Servisleri ve yöneticileri oluştur
-        this.settingsManager = new SettingsManager(configManager);
-        this.messageManager = new MessageManager(configManager);
-        this.placeholderService = new PlaceholderService();
-        this.effectService = new EffectService(configManager);
-        this.hologramService = new HologramService(messageManager);
-        this.bossBarService = new BossBarService(Objects.requireNonNull(configManager.getMainConfig().getConfigurationSection("boss-bar")));
-        this.rewardService = new RewardService(configManager, placeholderService);
-        this.abilityService = new AbilityService(effectService);
-        this.pinataRepository = new PinataRepository();
-        this.pinataService = new PinataService(this, settingsManager, messageManager, pinataRepository, hologramService, effectService, rewardService, placeholderService, bossBarService, abilityService);
-        this.eventManager = new EventManager(this, this.pinataService, this.configManager);
-        this.eventManager.start();
-
-        // 3. Piñata türlerini yükle
-        this.pinataService.loadPinataTypes();
-
-        // 4. Komutları ve Olay Dinleyicilerini kaydet
-        registerHandlers();
     }
 
     /**
@@ -143,6 +136,7 @@ public final class BenthPinata extends JavaPlugin {
         commandManager.registerCommand(new PinataReloadCommand(this));
         commandManager.registerCommand(new PinataKillAllCommand(this.pinataService, this.messageManager));
         commandManager.registerCommand(new PinataHelpCommand(this.messageManager));
+        commandManager.registerCommand(new PinataStatsCommand(this.playerStatsService, this.messageManager, this.statsLeaderboardService));
         Objects.requireNonNull(getCommand("pinata")).setExecutor(commandManager);
         Objects.requireNonNull(getCommand("pinata")).setTabCompleter(new TabCompleter(this.pinataService));
 

@@ -1,3 +1,5 @@
 .idea/
 target/
 benthpinata.iml
+foldercopier.py
+config.foldercopier.json

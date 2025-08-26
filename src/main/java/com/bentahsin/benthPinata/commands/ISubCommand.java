@@ -2,6 +2,8 @@ package com.bentahsin.benthPinata.commands;
 
 import org.bukkit.command.CommandSender;
 
+import java.util.List;
+
 /**
  * Tüm alt komutların uygulaması gereken arayüz (interface).
  * Bu yapı, komut yöneticisinin modüler olmasını sağlar.
@@ -24,4 +26,6 @@ public interface ISubCommand {
      * @param args Ana komuttan sonra gelen argümanlar.
      */
     void execute(CommandSender sender, String[] args);
+
+    List<String> tabComplete(CommandSender sender, String[] args);
 }

@@ -7,6 +7,7 @@ depend:
   - DecentHolograms
 softdepend:
   - TitleManager
+  - PlaceholderAPI
 
 commands:
   pinata:
@@ -34,3 +35,6 @@ permissions:
   benthpinata.command.help:
     description: /pinata help komutunu kullanma yetkisi.
     default: true
+  benthpinata.stats.reset:
+    description: Oyuncuların istatistiklerini sıfırlama yetkisi.
+    default: op

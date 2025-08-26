@@ -71,6 +71,10 @@
             <url>https://repo.codemc.io/repository/maven-public/</url>
             <layout>default</layout>
         </repository>
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -92,6 +96,13 @@
             <groupId>io.puharesource.mc</groupId>
             <artifactId>TitleManager</artifactId>
             <version>2.3.6</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.11.6</version> <!-- En son sürümü kontrol edin -->
             <scope>provided</scope>
         </dependency>
     </dependencies>
