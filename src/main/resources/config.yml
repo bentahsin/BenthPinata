@@ -93,7 +93,7 @@ pinata-types:
 sounds:
   countdown-start: 'ENTITY_PLAYER_LEVELUP'
   countdown-tick: 'UI_BUTTON_CLICK'
-  spawn: 'ENTITY_ENDERDRAGON_GROWL'
+  spawn: 'ENTITY_ENDER_DRAGON_GROWL'
   hit: 'ENTITY_PLAYER_ATTACK_SWEEP'
   death: 'ENTITY_WITHER_DEATH'
 
