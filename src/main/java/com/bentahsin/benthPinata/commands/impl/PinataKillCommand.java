@@ -58,7 +58,11 @@ public class PinataKillCommand implements ISubCommand {
         // Doğru Piñata'yı listeden al (index = id - 1)
         Pinata pinataToKill = activePinatas.get(pinataId - 1);
 
-        pinataService.killPinata(pinataToKill.getUniqueId());
+        boolean success = pinataService.killPinata(pinataToKill.getUniqueId());
+        if (!success) {
+            messageManager.sendMessage(sender, "kill-command-failure", "%id%", String.valueOf(pinataId));
+            return;
+        }
         messageManager.sendMessage(sender, "kill-command-success", "%id%", String.valueOf(pinataId), "%type%", pinataToKill.getType().id());
     }
 

@@ -21,6 +21,7 @@ invalid-coordinates: '&cKoordinatlar geçersiz. Lütfen sayısal değerler girin
 kill-command-usage: '&cKullanım: /pinata kill <ID>. ID''yi görmek için /pinata list kullanın.'
 kill-command-invalid-id: '&cGeçersiz veya bulunamayan Piñata ID''si: %id%'
 kill-command-success: '&aPiñata #%id% (%type%) başarıyla sonlandırıldı.'
+kill-command-fail: '&cPiñata #%id% sonlandırılamadı. Zaten ölmüş veya bir hata oluşmuş olabilir.'
 
 list-command-empty: '&eŞu anda aktif bir Piñata bulunmuyor.'
 list-command-header:

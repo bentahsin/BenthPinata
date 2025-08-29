@@ -14,6 +14,8 @@ import com.bentahsin.benthPinata.stats.StatsLeaderboardService;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Objects;
 
@@ -33,6 +35,7 @@ public final class BenthPinata extends JavaPlugin {
     private PlayerStatsService playerStatsService;
     private StatsLeaderboardService statsLeaderboardService;
     private BenthPinataExpansion expansion;
+    private BukkitTask autoSaveTask;
 
     @Override
     public void onEnable() {
@@ -110,6 +113,17 @@ public final class BenthPinata extends JavaPlugin {
             getLogger().info("PlaceholderAPI desteği başarıyla aktif edildi.");
         }
 
+        long autoSaveInterval = 20L * 60 * 10; // 10 Dakika (tick cinsinden)
+        this.autoSaveTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (playerStatsService != null) {
+                    playerStatsService.saveStatsAsync();
+                    getLogger().info("Oyuncu istatistikleri otomatik olarak kaydedildi.");
+                }
+            }
+        }.runTaskTimerAsynchronously(this, autoSaveInterval, autoSaveInterval);
+
         // 9. Komutları ve Listener'ları kaydet
         registerHandlers();
 
@@ -120,6 +134,9 @@ public final class BenthPinata extends JavaPlugin {
      * Eklentiyle ilgili tüm aktif işlemleri durdurur ve durumu temizler.
      */
     public void shutdown() {
+        if (this.autoSaveTask != null && !this.autoSaveTask.isCancelled()) {
+            this.autoSaveTask.cancel();
+        }
         if (this.statsLeaderboardService != null) {
             this.statsLeaderboardService.cancelTask(); // Servise görev iptal metodu ekle
         }
