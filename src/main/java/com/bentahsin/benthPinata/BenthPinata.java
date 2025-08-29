@@ -70,7 +70,7 @@ public final class BenthPinata extends JavaPlugin {
         HologramService hologramService = new HologramService(messageManager);
 
         // 4. BossBar servisini başlat
-        this.bossBarService = new BossBarService(Objects.requireNonNull(configManager.getMainConfig().getConfigurationSection("boss-bar")));
+        this.bossBarService = new BossBarService(Objects.requireNonNull(configManager.getMainConfig().getConfigurationSection("boss-bar")), this.messageManager);
 
         // 5. Diğer servislere bağımlı olan servisleri oluştur
         RewardService rewardService = new RewardService(configManager, placeholderService);

@@ -56,6 +56,9 @@ hologram:
     - '&d&lBenthPiñata'
     - '&fKalan Can: &c%health%&7/&a%max_health%'
 
+# BossBar Ayarları
+bossbar-title: '&d&l%pinata_type% &5Piñata'
+
 # Ölüm Anonsu (Sıralama)
 death-broadcast:
   - ''

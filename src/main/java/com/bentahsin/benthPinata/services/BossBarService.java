@@ -1,5 +1,6 @@
 package com.bentahsin.benthPinata.services;
 
+import com.bentahsin.benthPinata.configuration.MessageManager;
 import com.bentahsin.benthPinata.pinata.model.Pinata;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
@@ -18,9 +19,11 @@ public class BossBarService {
     private final BarColor color;
     private final BarStyle style;
     private final Map<UUID, BossBar> activeBossBars = new ConcurrentHashMap<>();
+    private final MessageManager messageManager;
 
-    public BossBarService(ConfigurationSection config) {
+    public BossBarService(ConfigurationSection config, MessageManager messageManager) {
         this.enabled = config.getBoolean("enabled", true);
+        this.messageManager = messageManager;
         try {
             this.color = BarColor.valueOf(Objects.requireNonNull(config.getString("color", "PINK")).toUpperCase());
             this.style = BarStyle.valueOf(Objects.requireNonNull(config.getString("style", "SOLID")).toUpperCase());
@@ -33,7 +36,7 @@ public class BossBarService {
     public void createBossBar(Pinata pinata) {
         if (!enabled) return;
 
-        String title = String.format("&d&l%s Piñata", pinata.getType().id());
+        String title = messageManager.getMessage("bossbar-title", "%pinata_type%", pinata.getType().id());
         BossBar bossBar = Bukkit.createBossBar(title, this.color, this.style);
         bossBar.setProgress(1.0);
 

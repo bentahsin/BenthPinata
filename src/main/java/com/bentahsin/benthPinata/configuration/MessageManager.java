@@ -4,6 +4,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -14,8 +16,39 @@ public class MessageManager {
 
     private final ConfigManager configManager;
 
+    private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
+
     public MessageManager(ConfigManager configManager) {
         this.configManager = configManager;
+    }
+
+    /**
+     * Hem standart (&) hem de HEX (&#RRGGBB) renk kodlarını çeviren metot.
+     * 1.13 API'si ile uyumludur ve 1.16+ sunucularda HEX renklerini gösterir.
+     * @param text Çevrilecek metin.
+     * @return Renklendirilmiş metin.
+     */
+    private String translateColorCodes(String text) {
+        if (text == null || text.isEmpty()) {
+            return "";
+        }
+
+        Matcher matcher = HEX_PATTERN.matcher(text);
+        StringBuffer buffer = new StringBuffer();
+
+        while (matcher.find()) {
+            // #RRGGBB'yi bul ve onu &x&R&R&G&G&B&B formatına çevir.
+            String hexColor = matcher.group(1);
+            StringBuilder magic = new StringBuilder("&x");
+            for (char c : hexColor.toCharArray()) {
+                magic.append('&').append(c);
+            }
+            matcher.appendReplacement(buffer, magic.toString());
+        }
+        matcher.appendTail(buffer);
+
+        // Son olarak, standart '&' renk kodlarını çevir.
+        return ChatColor.translateAlternateColorCodes('&', buffer.toString());
     }
 
     /**
@@ -26,16 +59,14 @@ public class MessageManager {
      */
     public String getMessage(String path, String... placeholders) {
         String message = configManager.getMessagesConfig().getString(path, "&cMesaj bulunamadı: " + path);
-
         for (int i = 0; i < placeholders.length; i += 2) {
             if (i + 1 < placeholders.length) {
-                assert message != null;
-                message = message.replace(placeholders[i], placeholders[i + 1]);
+                if (message != null) {
+                    message = message.replace(placeholders[i], placeholders[i + 1]);
+                }
             }
         }
-
-        assert message != null;
-        return ChatColor.translateAlternateColorCodes('&', message);
+        return translateColorCodes(message);
     }
 
     /**
@@ -45,7 +76,7 @@ public class MessageManager {
      */
     public List<String> getMessageList(String path) {
         return configManager.getMessagesConfig().getStringList(path).stream()
-                .map(line -> ChatColor.translateAlternateColorCodes('&', line))
+                .map(this::translateColorCodes)
                 .collect(Collectors.toList());
     }
 
