@@ -1,7 +1,7 @@
 .idea/
 target/
+dependency-reduced-pom.xml
 benthpinata.iml
 foldercopier.py
 config.foldercopier.json
 benthpinata.txt
-.gitignore
