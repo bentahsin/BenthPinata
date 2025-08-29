@@ -1,10 +1,10 @@
 package com.bentahsin.benthPinata.services;
 
 import com.bentahsin.benthPinata.BenthPinata;
-import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NbtApiException;
-import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.changeme.nbtapi.NBT;
+import de.tr7zw.changeme.nbtapi.NBTCompound;
+import de.tr7zw.changeme.nbtapi.NbtApiException;
+import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
