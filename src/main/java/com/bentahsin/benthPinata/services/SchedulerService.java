@@ -42,7 +42,18 @@ public class SchedulerService {
                 String dayStr = ((String) map.get("day")).toUpperCase();
                 String timeStr = (String) map.get("time");
                 int minPlayers = (int) map.get("minimum-players");
-                List<Integer> announceMinutes = (List<Integer>) map.get("announce-before");
+                List<?> rawAnnounceList = (List<?>) map.get("announce-before");
+                List<Integer> announceMinutes = new ArrayList<>();
+
+                if (rawAnnounceList != null) {
+                    for (Object obj : rawAnnounceList) {
+                        if (obj instanceof Integer) {
+                            announceMinutes.add((Integer) obj);
+                        } else {
+                            plugin.getLogger().warning("Zamanlanmış etkinlik '" + id + "' için 'announce-before' listesinde geçersiz bir değer bulundu: '" + obj + "'. Bu değer atlanıyor.");
+                        }
+                    }
+                }
 
                 DayOfWeek dayOfWeek = null;
                 if (!dayStr.equals("EVERYDAY")) {
