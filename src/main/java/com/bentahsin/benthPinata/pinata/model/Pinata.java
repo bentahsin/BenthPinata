@@ -2,7 +2,7 @@ package com.bentahsin.benthPinata.pinata.model;
 
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Sheep;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -18,7 +18,7 @@ public class Pinata {
     public static final String METADATA_KEY = "benthpinata_id";
     private final UUID uniqueId;
     private final PinataType type;
-    private final Sheep entity;
+    private final LivingEntity entity;
     private Hologram hologram;
     private BukkitTask updateTask;
     private int currentHealth;
@@ -26,7 +26,7 @@ public class Pinata {
     private final Map<UUID, Set<String>> claimedThresholds = new ConcurrentHashMap<>();
     private final Set<PinataAbility> triggeredAbilities = new HashSet<>();
 
-    public Pinata(PinataType type, Sheep entity) {
+    public Pinata(PinataType type, LivingEntity entity) {
         this.uniqueId = UUID.randomUUID();
         this.type = type;
         this.entity = entity;
@@ -97,7 +97,7 @@ public class Pinata {
     // Getters and Setters
     public UUID getUniqueId() { return uniqueId; }
     public PinataType getType() { return type; }
-    public Sheep getEntity() { return entity; }
+    public LivingEntity getEntity() { return entity; }
     public int getCurrentHealth() { return currentHealth; }
     public Map<UUID, Integer> getDamagers() { return damagers; }
     public BukkitTask getUpdateTask() { return updateTask; }

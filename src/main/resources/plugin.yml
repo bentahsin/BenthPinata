@@ -23,6 +23,8 @@ permissions:
       - benthpinata.command.killall
       - benthpinata.command.reload
       - benthpinata.command.help
+      - benthpinata.command.list
+      - benthpinata.command.kill
   benthpinata.command.start:
     description: /pinata start komutunu kullanma yetkisi.
     default: op
@@ -35,6 +37,12 @@ permissions:
   benthpinata.command.help:
     description: /pinata help komutunu kullanma yetkisi.
     default: true
+  benthpinata.command.list:
+    description: /pinata list komutunu kullanma yetkisi.
+    default: op
+  benthpinata.command.kill:
+    description: /pinata kill <ID> komutunu kullanma yetkisi.
+    default: op
   benthpinata.stats.reset:
     description: Oyuncuların istatistiklerini sıfırlama yetkisi.
     default: op

@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Metinlerdeki özel placeholder'ları (%cp_top_name_1% gibi) gerçek verilerle değiştirir.
+ * Metinlerdeki özel placeholder'ları (%bp_top_name_1% gibi) gerçek verilerle değiştirir.
  */
 public class PlaceholderService {
 

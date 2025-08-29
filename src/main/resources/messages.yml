@@ -2,22 +2,42 @@
 # Eklentideki tüm metinleri buradan düzenleyebilirsiniz.
 
 # Title/Subtitle formatı: 'Başlık;Alt Başlık' şeklinde ; ile ayrılır.
-# Placeholder'lar: %player%, %time%, %health%, %cp_top_name_X%, %cp_top_dmg_X%
+# Placeholder'lar: %player%, %time%, %health%, %bp_top_name_X%, %bp_top_dmg_X%
 
 # Genel Mesajlar
 no-permission: '&cBu komutu kullanmak için yetkiniz yok.'
 invalid-command-usage: '&cGeçersiz komut. Yardım için /pinata help'
+player-only-command: '&cBu komutu sadece oyuncular kullanabilir.'
 start-command-usage: '&cKullanım: &7/pinata start <tür_adı>'
 pinata-type-not-found: '&cBelirtilen Piñata türü bulunamadı.'
 killall-success: '&aTüm aktif Piñata''lar ve görevler sonlandırıldı.'
 reload-success: '&aBenthPinata eklentisi başarıyla yeniden yüklendi.'
+scheduled-event-announcement: '&d&l[BenthPiñata] &eDikkat! &6%pinata_type% &ePiñata etkinliği &c%minutes% &edakika içinde başlayacak!'
+scheduled-event-start: '&d&l[BenthPiñata] &aZamanı geldi! Zamanlanmış &6%pinata_type% &aPiñata etkinliği başlıyor!'
+invalid-world: '&cGeçersiz veya bulunamayan dünya: %world%'
+invalid-coordinates: '&cKoordinatlar geçersiz. Lütfen sayısal değerler girin.'
+
+
+kill-command-usage: '&cKullanım: /pinata kill <ID>. ID''yi görmek için /pinata list kullanın.'
+kill-command-invalid-id: '&cGeçersiz veya bulunamayan Piñata ID''si: %id%'
+kill-command-success: '&aPiñata #%id% (%type%) başarıyla sonlandırıldı.'
+
+list-command-empty: '&eŞu anda aktif bir Piñata bulunmuyor.'
+list-command-header:
+  - '&e&m------------------&r&e Aktif Piñata''lar &m------------------'
+list-command-format: '&6#%id% &f- &eTür: &b%type% &f- &eCan: &c%health%&7/&a%max_health% &f- &eKonum: &7%world%, %x%, %y%, %z%'
+list-command-footer:
+  - '&e&m----------------------------------------------------'
 
 # Yardım Menüsü
 help-command:
   - '&e&m-------------------------------------------'
-  - '&6/pinata start <tür> &f- Piñata etkinliğini başlatır.'
+  - '&6/pinata start <tür> [konum] &f- Piñata etkinliğini başlatır.'
+  - '&6/pinata list &f- Aktif Piñata''ları listeler.'
+  - '&6/pinata kill <ID> &f- Belirtilen Piñata''yı sonlandırır.'
   - '&6/pinata killall &f- Tüm Piñata''ları siler.'
   - '&6/pinata reload &f- Eklentiyi yeniden yükler.'
+  - '&6/pinata stats [top|reset] &f- İstatistikleri yönetir.'
   - '&e&m-------------------------------------------'
 
 # Etkinlik Anonsları

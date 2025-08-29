@@ -11,14 +11,12 @@ import com.bentahsin.benthPinata.stats.PlayerStatsService;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Sheep;
+import org.bukkit.entity.*;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -42,6 +40,7 @@ public class PinataService {
     private final BossBarService bossBarService;
     private final AbilityService abilityService;
     private final PlayerStatsService playerStatsService;
+    private final MobCustomizerService mobCustomizerService;
 
     private final Map<String, PinataType> loadedPinataTypes = new HashMap<>();
     private final List<BukkitTask> activeTasks = new ArrayList<>();
@@ -51,7 +50,7 @@ public class PinataService {
                          PinataRepository pinataRepository, HologramService hologramService,
                          EffectService effectService, RewardService rewardService, PlaceholderService placeholderService,
                          BossBarService bossBarService, AbilityService abilityService,
-                         PlayerStatsService playerStatsService) {
+                         PlayerStatsService playerStatsService, MobCustomizerService mobCustomizerService) {
         this.plugin = plugin;
         this.settingsManager = settingsManager;
         this.messageManager = messageManager;
@@ -63,11 +62,12 @@ public class PinataService {
         this.bossBarService = bossBarService;
         this.abilityService = abilityService;
         this.playerStatsService = playerStatsService;
+        this.mobCustomizerService = mobCustomizerService;
     }
 
     /**
      * Eklenti açılırken veya yeniden yüklenirken config'den tüm Piñata türlerini okur ve belleğe yükler.
-     * Bu metot artık daha sağlam ve hata ayıklama için daha fazla bilgi sağlar.
+     * Bu metot artık mob türlerini ve özel seçenekleri de destekliyor.
      */
     public void loadPinataTypes() {
         loadedPinataTypes.clear();
@@ -76,7 +76,6 @@ public class PinataService {
 
         if (abilitiesConfig == null) {
             plugin.getLogger().severe("Abilities config (abilities.yml) yüklenemedi! Yetenekler devre dışı kalacak.");
-            return;
         }
 
         String typesPath = "pinata-types";
@@ -87,62 +86,44 @@ public class PinataService {
             return;
         }
 
-        Set<String> typeIds = pinataTypesSection.getKeys(false);
+        for (String id : pinataTypesSection.getKeys(false)) {
+            String typePath = typesPath + "." + id;
 
-        for (String id : typeIds) {
-            String locationString = mainConfig.getString(typesPath + "." + id + ".spawn-location");
+            String locationString = mainConfig.getString(typePath + ".spawn-location");
             Location spawnLocation = parseLocation(locationString);
             if (spawnLocation == null) {
                 plugin.getLogger().warning(id + " adlı Piñata türü için konum geçersiz. Bu tür yüklenmedi.");
                 continue;
             }
-            int health = mainConfig.getInt(typesPath + "." + id + ".health", settingsManager.getDefaultPinataHealth());
 
-            List<PinataAbility> abilities = new ArrayList<>();
+            int health = mainConfig.getInt(typePath + ".health", settingsManager.getDefaultPinataHealth());
 
-            if (abilitiesConfig.isSet(id)) {
-                List<Map<?, ?>> abilityMaps = abilitiesConfig.getMapList(id);
-
-                if (abilityMaps.isEmpty()) {
-                    plugin.getLogger().warning("'" + id + "' için abilities.yml dosyasında bir bölüm bulundu, ancak içi boş veya hatalı biçimlendirilmiş. Yetenek yüklenmedi.");
+            EntityType entityType;
+            String entityTypeName = Objects.requireNonNull(mainConfig.getString(typePath + ".entity-type", "SHEEP")).toUpperCase();
+            try {
+                entityType = EntityType.valueOf(entityTypeName);
+                if (!entityType.isAlive()) {
+                    throw new IllegalArgumentException("Varlık canlı bir mob değil.");
                 }
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning(id + " adlı Piñata için geçersiz entity-type: '" + entityTypeName + "'. Varsayılan olarak KOYUN (SHEEP) kullanılıyor.");
+                entityType = EntityType.SHEEP;
+            }
 
-                for (Map<?, ?> map : abilityMaps) {
-                    try {
-                        String type = (String) map.get("type");
-                        String trigger = (String) map.get("trigger");
-
-                        int value = getIntFromMap(map, "value", 0);
-                        int range = getIntFromMap(map, "range", 10);
-                        int power = getIntFromMap(map, "power", 1);
-                        int duration = getIntFromMap(map, "duration", 5);
-                        String message = (String) map.get("message");
-                        String sound = (String) map.get("sound");
-
-                        List<PotionEffectType> potions = new ArrayList<>();
-                        Object rawPotionList = map.get("potion-effects");
-                        if (rawPotionList instanceof List) {
-                            for (Object rawEffect : (List<?>) rawPotionList) {
-                                if (rawEffect instanceof String) {
-                                    PotionEffectType effectType = PotionEffectType.getByName((String) rawEffect);
-                                    if (effectType != null) {
-                                        potions.add(effectType);
-                                    } else {
-                                        plugin.getLogger().warning(id + " türü için yetenekte geçersiz iksir efekti: " + rawEffect);
-                                    }
-                                }
-                            }
-                        }
-                        abilities.add(new PinataAbility(type, trigger, value, range, power, duration, message, sound, potions));
-                    } catch (Exception e) {
-                        plugin.getLogger().severe(id + " türü için bir yetenek yüklenirken hata oluştu: " + e.getMessage());
-                    }
+            Map<String, Object> mobOptions = new HashMap<>();
+            ConfigurationSection optionsSection = mainConfig.getConfigurationSection(typePath + ".mob-options");
+            if (optionsSection != null) {
+                for (String key : optionsSection.getKeys(false)) {
+                    mobOptions.put(key, optionsSection.get(key));
                 }
             }
 
-            PinataType pinataType = new PinataType(id, spawnLocation, health, abilities);
+            List<PinataAbility> abilities = loadAbilitiesForType(id, abilitiesConfig);
+
+            // PinataType nesnesini oluştur ve haritaya ekle
+            PinataType pinataType = new PinataType(id, spawnLocation, health, abilities, entityType, mobOptions);
             loadedPinataTypes.put(id.toLowerCase(), pinataType);
-            plugin.getLogger().info(id + " adlı Piñata türü " + abilities.size() + " yetenek ile yüklendi.");
+            plugin.getLogger().info(id + " adlı Piñata türü (" + entityType.name() + ") " + abilities.size() + " yetenek ile yüklendi.");
         }
     }
 
@@ -156,40 +137,53 @@ public class PinataService {
 
     /**
      * Belirtilen türde bir Piñata etkinliği için geri sayımı başlatır.
+     * Konum olarak config dosyasındaki varsayılan konumu kullanır.
+     *
      * @param typeName Başlatılacak Piñata'nın tür ID'si.
+     */
+    public void startEvent(String typeName) {
+        startEvent(typeName, null);
+    }
+
+    /**
+     * Belirtilen türde bir Piñata etkinliğini özel bir konumda başlatır.
+     * Bu, tüm başlatma mantığının merkezi noktasıdır.
+     * @param typeName Başlatılacak Piñata'nın tür ID'si.
+     * @param customLocation Piñata'nın doğacağı özel konum. Eğer null ise config'deki konum kullanılır.
      * @return Başlatma başarılıysa true, tür bulunamazsa false.
      */
-    public boolean startEvent(String typeName) {
+    public boolean startEvent(String typeName, Location customLocation) {
         Optional<PinataType> typeOpt = getPinataType(typeName);
         if (typeOpt.isEmpty()) {
             return false;
         }
         PinataType type = typeOpt.get();
 
+        // Nihai konumu belirle: Özel konum varsa onu, yoksa config'deki konumu kullan.
+        final Location finalLocation = (customLocation != null) ? customLocation : type.spawnLocation();
+
         broadcastTitle("countdown-started");
-        effectService.playSoundForAll("countdown-start", type.spawnLocation());
+        effectService.playSoundForAll("countdown-start", finalLocation); // Efektler için yeni konumu kullan
 
         int countdownTime = settingsManager.getCountdownTime();
         final int[] remainingTime = {countdownTime};
 
-        BukkitTask task = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+        final BukkitTask[] task = new BukkitTask[1];
+        task[0] = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             if (remainingTime[0] < 1) {
-                spawnPinata(type);
+                spawnPinata(type, finalLocation); // Spawn için yeni konumu kullan
+                task[0].cancel();
+                activeTasks.remove(task[0]);
                 return;
             }
+
             broadcastTitle("countdown-title", "%time%", String.valueOf(remainingTime[0]));
-            effectService.playSoundForAll("countdown-tick", type.spawnLocation());
+            effectService.playSoundForAll("countdown-tick", finalLocation); // Efektler için yeni konumu kullan
             remainingTime[0]--;
+
         }, 0L, 20L);
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (!task.isCancelled()) {
-                task.cancel();
-                activeTasks.remove(task);
-            }
-        }, (countdownTime + 1) * 20L);
-
-        activeTasks.add(task);
+        activeTasks.add(task[0]);
         return true;
     }
 
@@ -257,30 +251,42 @@ public class PinataService {
 
     /**
      * Dünyada bir Piñata oluşturur ve onu yönetmeye başlar.
+     * Bu metot artık herhangi bir LivingEntity yaratabilir.
      * @param type Oluşturulacak Piñata'nın türü.
      */
-    private void spawnPinata(PinataType type) {
-        Location loc = type.spawnLocation();
-        Sheep sheep = (Sheep) Objects.requireNonNull(loc.getWorld()).spawnEntity(loc, EntityType.SHEEP);
+    private void spawnPinata(PinataType type, Location loc) {
+        World world = loc.getWorld();
+        if (world == null) {
+            plugin.getLogger().severe(type.id() + " için dünya bulunamadı! Piñata oluşturulamadı.");
+            return;
+        }
 
-        // Entity ayarları
-        sheep.setInvulnerable(false);
-        sheep.setCollidable(false);
-        sheep.setAI(true);
-        sheep.setCustomNameVisible(false);
-        sheep.setRemoveWhenFarAway(false);
-        sheep.setMetadata(Pinata.METADATA_KEY, new FixedMetadataValue(plugin, type.id()));
+        // Entity'yi belirtilen türde yarat.
+        Entity spawnedEntity = world.spawnEntity(loc, type.entityType());
+        if (!(spawnedEntity instanceof LivingEntity livingEntity)) {
+            plugin.getLogger().severe(type.id() + " için yaratılan varlık bir LivingEntity değil! Bu bir hata. Lütfen kontrol edin.");
+            spawnedEntity.remove(); // Hatalı entity'yi temizle
+            return;
+        }
 
-        Pinata pinata = new Pinata(type, sheep);
+        // Genel entity ayarları
+        livingEntity.setRemoveWhenFarAway(false);
+        livingEntity.setMetadata(Pinata.METADATA_KEY, new FixedMetadataValue(plugin, type.id()));
+
+        mobCustomizerService.applyOptions(livingEntity, type.mobOptions());
+
+
+        Pinata pinata = new Pinata(type, livingEntity);
         hologramService.createHologramFor(pinata);
         pinataRepository.save(pinata);
         bossBarService.createBossBar(pinata);
 
         broadcastTitle("pinata-spawned");
-        effectService.playSoundForAll("spawn", sheep.getLocation());
+        effectService.playSoundForAll("spawn", livingEntity.getLocation());
 
+        // Periyodik güncelleme görevi
         BukkitTask updateTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            if (!pinata.getEntity().isValid()) {
+            if (!pinata.getEntity().isValid() || pinata.isDying()) {
                 if (pinata.getUpdateTask() != null && !pinata.getUpdateTask().isCancelled()) {
                     pinata.getUpdateTask().cancel();
                     activeTasks.remove(pinata.getUpdateTask());
@@ -288,25 +294,68 @@ public class PinataService {
                 return;
             }
 
-            // Normal güncelleme mantığı
-            pinata.getEntity().setColor(DyeColor.values()[new Random().nextInt(DyeColor.values().length)]);
+            // Hologramı ve yetenekleri güncelle
             hologramService.updateHologramFor(pinata);
             abilityService.tryTriggerAbilities(pinata);
 
-            // Rastgele bir oyuncuyu hedef al
-            List<Player> nearbyPlayers = pinata.getEntity().getNearbyEntities(30, 30, 30)
-                    .stream()
-                    .filter(e -> e instanceof Player)
-                    .map(e -> (Player) e)
-                    .toList();
-            if (!nearbyPlayers.isEmpty()) {
-                pinata.getEntity().setTarget(nearbyPlayers.get(new Random().nextInt(nearbyPlayers.size())));
+            if (pinata.getEntity() instanceof Sheep sheep) {
+                sheep.setColor(org.bukkit.DyeColor.values()[new Random().nextInt(org.bukkit.DyeColor.values().length)]);
             }
 
-        }, 20L, 40L);
+            // Rastgele bir oyuncuyu hedef al (AI varsa)
+            if (pinata.getEntity().hasAI()) {
+                List<Player> nearbyPlayers = pinata.getEntity().getNearbyEntities(30, 30, 30)
+                        .stream()
+                        .filter(e -> e instanceof Player)
+                        .map(e -> (Player) e)
+                        .toList();
+                if (!nearbyPlayers.isEmpty() && pinata.getEntity() instanceof Mob mob) {
+                    mob.setTarget(nearbyPlayers.get(new Random().nextInt(nearbyPlayers.size())));
+                }
+            }
+        }, 20L, 4L);
 
         pinata.setUpdateTask(updateTask);
         activeTasks.add(updateTask);
+    }
+
+    private List<PinataAbility> loadAbilitiesForType(String typeId, FileConfiguration abilitiesConfig) {
+        List<PinataAbility> abilities = new ArrayList<>();
+        if (abilitiesConfig == null || !abilitiesConfig.isSet(typeId)) {
+            return abilities;
+        }
+
+        List<Map<?, ?>> abilityMaps = abilitiesConfig.getMapList(typeId);
+        for (Map<?, ?> map : abilityMaps) {
+            try {
+                String type = (String) map.get("type");
+                String trigger = (String) map.get("trigger");
+                int value = getIntFromMap(map, "value", 0);
+                int range = getIntFromMap(map, "range", 10);
+                int power = getIntFromMap(map, "power", 1);
+                int duration = getIntFromMap(map, "duration", 5);
+                String message = (String) map.get("message");
+                String sound = (String) map.get("sound");
+
+                List<PotionEffectType> potions = new ArrayList<>();
+                if (map.get("potion-effects") instanceof List<?> rawPotionList) {
+                    for (Object rawEffect : rawPotionList) {
+                        if (rawEffect instanceof String) {
+                            PotionEffectType effectType = PotionEffectType.getByName((String) rawEffect);
+                            if (effectType != null) {
+                                potions.add(effectType);
+                            } else {
+                                plugin.getLogger().warning(typeId + " türü için yetenekte geçersiz iksir efekti: " + rawEffect);
+                            }
+                        }
+                    }
+                }
+                abilities.add(new PinataAbility(type, trigger, value, range, power, duration, message, sound, potions));
+            } catch (Exception e) {
+                plugin.getLogger().severe(typeId + " türü için bir yetenek yüklenirken hata oluştu: " + e.getMessage());
+            }
+        }
+        return abilities;
     }
 
     /**
@@ -388,6 +437,21 @@ public class PinataService {
             plugin.getLogger().severe("Konum formatı hatalı: " + locStr);
             return null;
         }
+    }
+
+    /**
+     * Belirtilen UUID'ye sahip tek bir Piñata'yı bulur ve sonlandırır.
+     * @param pinataId Sonlandırılacak Piñata'nın eşsiz kimliği (UUID).
+     * @return Piñata bulunup başarıyla sonlandırıldıysa true, aksi takdirde false.
+     */
+    public boolean killPinata(UUID pinataId) {
+        for (Pinata pinata : pinataRepository.findAll()) {
+            if (pinata.getUniqueId().equals(pinataId)) {
+                cleanupPinata(pinata);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -32,6 +32,7 @@ public final class BenthPinata extends JavaPlugin {
     private EventManager eventManager;
     private PlayerStatsService playerStatsService;
     private StatsLeaderboardService statsLeaderboardService;
+    private BenthPinataExpansion expansion;
 
     @Override
     public void onEnable() {
@@ -41,7 +42,7 @@ public final class BenthPinata extends JavaPlugin {
     @Override
     public void onDisable() {
         if (this.playerStatsService != null) {
-            this.playerStatsService.saveStats();
+            this.playerStatsService.saveStatsSync();
         }
         shutdown();
         getLogger().info("BenthPinata eklentisi devre dışı bırakıldı.");
@@ -72,8 +73,9 @@ public final class BenthPinata extends JavaPlugin {
         RewardService rewardService = new RewardService(configManager, placeholderService);
         AbilityService abilityService = new AbilityService(effectService);
         this.playerStatsService = new PlayerStatsService(this);
-        this.playerStatsService.loadStats();
+        this.playerStatsService.loadStatsAsync();
         this.statsLeaderboardService = new StatsLeaderboardService(this, this.playerStatsService);
+        MobCustomizerService mobCustomizerService = new MobCustomizerService(this);
 
         // 6. Depo ve Ana Servis katmanlarını oluştur
         this.pinataRepository = new PinataRepository();
@@ -88,31 +90,42 @@ public final class BenthPinata extends JavaPlugin {
                 placeholderService,
                 bossBarService,
                 abilityService,
-                playerStatsService
+                playerStatsService,
+                mobCustomizerService
         );
 
         // 7. EventManager'ı, pinataService oluşturulduktan sonra başlat
         this.eventManager = new EventManager(this, this.pinataService, this.configManager);
         this.eventManager.start();
 
+        SchedulerService schedulerService = new SchedulerService(this, this.pinataService);
+        schedulerService.loadAndStart();
+
         // 8. Eklenti başlarken Piñata türlerini config'den yükle
         this.pinataService.loadPinataTypes();
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new BenthPinataExpansion(this.playerStatsService, this.statsLeaderboardService).register();
+            this.expansion = new BenthPinataExpansion(this.playerStatsService, this.statsLeaderboardService);
+            this.expansion.register();
             getLogger().info("PlaceholderAPI desteği başarıyla aktif edildi.");
         }
 
         // 9. Komutları ve Listener'ları kaydet
         registerHandlers();
 
-        getLogger().info("BenthPinata eklentisi yeni mimari ile başarıyla başlatıldı!");
+        getLogger().info("BenthPinata eklentisi başlatıldı!");
     }
 
     /**
      * Eklentiyle ilgili tüm aktif işlemleri durdurur ve durumu temizler.
      */
     public void shutdown() {
+        if (this.statsLeaderboardService != null) {
+            this.statsLeaderboardService.cancelTask(); // Servise görev iptal metodu ekle
+        }
+        if (this.expansion != null && this.expansion.isRegistered()) {
+            this.expansion.unregister(); // PAPI kaydını sil
+        }
         if (this.pinataService != null) {
             this.pinataService.killAll();
         }
@@ -130,6 +143,8 @@ public final class BenthPinata extends JavaPlugin {
         commandManager.registerCommand(new PinataKillAllCommand(this.pinataService, this.messageManager));
         commandManager.registerCommand(new PinataHelpCommand(this.messageManager));
         commandManager.registerCommand(new PinataStatsCommand(this.playerStatsService, this.messageManager, this.statsLeaderboardService));
+        commandManager.registerCommand(new PinataListCommand(this.pinataRepository, this.messageManager));
+        commandManager.registerCommand(new PinataKillCommand(this.pinataService, this.pinataRepository, this.messageManager));
 
         Objects.requireNonNull(getCommand("pinata")).setExecutor(commandManager);
         Objects.requireNonNull(getCommand("pinata")).setTabCompleter(commandManager);

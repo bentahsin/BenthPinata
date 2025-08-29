@@ -2,6 +2,7 @@ package com.bentahsin.benthPinata.stats;
 
 import com.bentahsin.benthPinata.BenthPinata;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,20 +20,33 @@ public class StatsLeaderboardService {
     private volatile List<PlayerStats> topDamage = Collections.emptyList();
     private volatile List<PlayerStats> topKills = Collections.emptyList();
 
+    private BukkitTask updateTask;
+
     public StatsLeaderboardService(BenthPinata plugin, PlayerStatsService playerStatsService) {
         this.playerStatsService = playerStatsService;
         startUpdateTask(plugin);
     }
 
     private void startUpdateTask(BenthPinata plugin) {
-        // Her 5 dakikada bir asenkron olarak çalışacak bir görev başlat.
         long intervalTicks = TimeUnit.MINUTES.toSeconds(5) * 20;
-        new BukkitRunnable() {
+
+        this.updateTask = new BukkitRunnable() {
             @Override
             public void run() {
                 updateLeaderboards();
             }
-        }.runTaskTimerAsynchronously(plugin, 20L, intervalTicks); // Başlangıçtan 1 saniye sonra başla
+        }.runTaskTimerAsynchronously(plugin, 20L, intervalTicks);
+    }
+
+    /**
+     * 3. Bu yeni metot, zamanlanmış liderlik tablosu güncelleme görevini iptal eder.
+     * Eklenti devre dışı bırakılırken veya yeniden yüklenirken kaynak sızıntılarını önler.
+     */
+    public void cancelTask() {
+        if (this.updateTask != null && !this.updateTask.isCancelled()) {
+            this.updateTask.cancel();
+            this.updateTask = null;
+        }
     }
 
     /**

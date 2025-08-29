@@ -32,31 +32,51 @@ general:
 # ------------------------------------------------------------------ #
 #
 # Burada istediğiniz kadar farklı Piñata türü oluşturabilirsiniz.
-# Her türün kendine özgü konumu, canı ve diğer özellikleri olabilir.
-# Yeni bir tür eklemek için mevcut 'default' türünü kopyalayıp
-# yapıştırın ve ismini ('default') değiştirin.
-#
-# Komut: /pinata start <tür_adı> (örn: /pinata start default)
+# Her türün kendine özgü konumu, canı, görünüşü ve diğer özellikleri olabilir.
+# Komut: /pinata start <tür_adı>
 #
 pinata-types:
-  # Bu, 'default' ismindeki Piñata türüdür.
+  # Bu, 'default' ismindeki Piñata türüdür. Geriye dönük uyumluluk için
+  # 'entity-type' belirtilmediğinde KOYUN olarak doğar.
   default:
-    # Piñata'nın doğacağı konum.
-    # Format: 'dunya_adi;x;y;z'
-    # Bu koordinatları oyun içinde F3 tuşuna basarak veya bir komutla alabilirsiniz.
-    # ÖNEMLİ: Dünyanızın adını doğru yazdığınızdan emin olun!
     spawn-location: 'world;0;100;0'
-
-    # Bu türe özel can değeri.
-    # Eğer bu satırı silerseniz veya yorum satırı yaparsanız (#),
-    # yukarıdaki 'default-pinata-health' değeri kullanılır.
     health: 150
 
-  # Örnek olarak ikinci bir tür. Bu türün adı 'arena'.
-  # Bu bölümün başındaki '#' işaretini kaldırarak aktif edebilirsiniz.
-  #arena:
-  #  spawn-location: 'arena_dunyasi;150;64;-200'
-  #  # Bu tür için özel bir can belirtilmediği için 100 canla doğacaktır.
+  # Bu, 'zindan' isminde bir Zombi Piñata türüdür.
+  zindan:
+    spawn-location: 'world;15;70;25'
+    health: 250
+    entity-type: 'ZOMBIE'
+    mob-options:
+      is-baby: false
+      glowing: true
+      custom-name: '&4&lZİNDAN PİÑATASI'
+      custom-name-visible: true
+      # NBT verisi enjekte ediyoruz. Formatın geçerli bir JSON/NBT olduğundan emin olun!
+      # Yaygın etiketler: { "Silent": 1b }, { "NoAI": 1b }, { "Invulnerable": 1b }
+      nbt-data: '{ "Silent": 1b, "NoAI": 1b }'
+
+  # Bu, 'tüccar' isminde, mor halılı ve özel bir Lamadır.
+  tuccar:
+    spawn-location: 'dungeon;150;64;-200'
+    health: 100
+    entity-type: 'LLAMA'
+    mob-options:
+      custom-name: '&e&lGezgin Tüccar Piñata'
+      glowing: false
+      # Llama'ya özel seçenekler
+      llama-color: 'CREAMY'      # Renkler: CREAMY, WHITE, BROWN, GRAY
+      carpet-color: 'PURPLE'   # Herhangi bir yün rengi (örn: BLUE, RED...)
+
+  # At Piñata örneği
+  pegasus:
+    spawn-location: 'world;0;100;0'
+    health: 300
+    entity-type: 'HORSE'
+    mob-options:
+      glowing: true
+      horse-color: 'WHITE' # Renkler: WHITE, CREAMY, CHESTNUT, BROWN, BLACK, GRAY, DARK_BROWN
+      horse-style: 'WHITE_DOTS' # Stiller: NONE, WHITE, WHITEFIELD, WHITE_DOTS, BLACK_DOTS
 
 
 # ------------------------------------------------------------------ #
@@ -147,6 +167,46 @@ automatic-events:
 
     # Başlatılacak Piñata'nın türü.
     pinata-type: "arena"
+
+  # Zamanlanmış Etkinlikler (Scheduler)
+  # Sunucunuz için belirli gün ve saatlerde otomatik etkinlikler planlayın.
+  scheduled:
+    # Bu sistemi tamamen açar veya kapatır.
+    enabled: true
+    # Zamanlanmış tüm etkinliklerin listesi. İstediğiniz kadar ekleyebilirsiniz.
+    schedules:
+      # Örnek 1: Her Cuma akşamı saat 20:00'de 'zindan' Piñata'sını başlatan bir etkinlik.
+      - id: 'cuma_aksami_boss' # Her zamanlama için eşsiz bir kimlik (loglar için kullanışlı).
+        enabled: true # Bu özel zamanlamayı açar veya kapatır.
+        pinata-type: 'zindan'
+        # Günler: MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+        # Veya her gün için: 'EVERYDAY'
+        day: 'FRIDAY'
+        # Saat: "HH:mm" formatında (24 saatlik dilim).
+        time: '20:00'
+        # Etkinliğin başlayabilmesi için sunucuda olması gereken minimum oyuncu sayısı.
+        minimum-players: 10
+        # Etkinlik başlamadan önce yapılacak duyurular (dakika cinsinden).
+        # Bu örnekte etkinlikten 15, 5 ve 1 dakika önce duyuru yapılır.
+        announce-before: [ 15, 5, 1 ]
+
+      # Örnek 2: Her gün öğleden sonra 15:30'da 'default' Piñata'sını başlatan bir etkinlik.
+      - id: 'gunluk_odul_pinata'
+        enabled: true
+        pinata-type: 'default'
+        day: 'EVERYDAY'
+        time: '15:30'
+        minimum-players: 5
+        announce-before: [ 5, 1 ]
+
+      # Örnek 3: Pazar günü öğlen 12:00'de başlayacak ama şu anlık kapalı olan bir etkinlik.
+      - id: 'pazar_etkinligi'
+        enabled: false
+        pinata-type: 'pegasus'
+        day: 'SUNDAY'
+        time: '12:00'
+        minimum-players: 15
+        announce-before: [ 10, 5, 1 ]
 
 # ------------------------------------------------------------------ #
 #                    BenthPinata v1.0.0 by bentahsin                 #
