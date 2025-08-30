@@ -36,7 +36,8 @@ public class PinataInteractionListener implements Listener {
             event.setCancelled(true);
         }
 
-        if (event.getDamager() instanceof Player damager && pinataOpt.isPresent()) {
+        if (event.getDamager() instanceof Player && pinataOpt.isPresent()) {
+            Player damager = (Player) event.getDamager();
             Pinata pinata = pinataOpt.get();
             pinataService.handleDamage(damager, pinata);
         }

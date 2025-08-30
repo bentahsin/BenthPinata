@@ -20,7 +20,7 @@ public class PlaceholderService {
 
     public String parseTopDamagers(String text, List<Map.Entry<UUID, Integer>> sortedDamagers) {
         Matcher matcher = TOP_DAMAGER_PATTERN.matcher(text);
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
 
         while (matcher.find()) {
             String type = matcher.group(1);

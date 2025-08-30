@@ -22,6 +22,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Piñata'ların tüm yaşam döngüsünü yöneten ana servis.
@@ -154,13 +155,14 @@ public class PinataService {
      */
     public boolean startEvent(String typeName, Location customLocation) {
         Optional<PinataType> typeOpt = getPinataType(typeName);
-        if (typeOpt.isEmpty()) {
+        if (!typeOpt.isPresent()) {
             return false;
         }
+
         PinataType type = typeOpt.get();
 
         // Nihai konumu belirle: Özel konum varsa onu, yoksa config'deki konumu kullan.
-        final Location finalLocation = (customLocation != null) ? customLocation : type.spawnLocation();
+        final Location finalLocation = (customLocation != null) ? customLocation : type.getSpawnLocation();
 
         broadcastTitle("countdown-started");
         effectService.playSoundForAll("countdown-start", finalLocation); // Efektler için yeni konumu kullan
@@ -257,23 +259,24 @@ public class PinataService {
     private void spawnPinata(PinataType type, Location loc) {
         World world = loc.getWorld();
         if (world == null) {
-            plugin.getLogger().severe(type.id() + " için dünya bulunamadı! Piñata oluşturulamadı.");
+            plugin.getLogger().severe(type.getId() + " için dünya bulunamadı! Piñata oluşturulamadı.");
             return;
         }
 
         // Entity'yi belirtilen türde yarat.
-        Entity spawnedEntity = world.spawnEntity(loc, type.entityType());
-        if (!(spawnedEntity instanceof LivingEntity livingEntity)) {
-            plugin.getLogger().severe(type.id() + " için yaratılan varlık bir LivingEntity değil! Bu bir hata. Lütfen kontrol edin.");
+        Entity spawnedEntity = world.spawnEntity(loc, type.getEntityType());
+        if (!(spawnedEntity instanceof LivingEntity)) {
+            plugin.getLogger().severe(type.getId() + " için yaratılan varlık bir LivingEntity değil! Bu bir hata. Lütfen kontrol edin.");
             spawnedEntity.remove(); // Hatalı entity'yi temizle
             return;
         }
+        LivingEntity livingEntity = (LivingEntity) spawnedEntity;
 
         // Genel entity ayarları
         livingEntity.setRemoveWhenFarAway(false);
-        livingEntity.setMetadata(Pinata.METADATA_KEY, new FixedMetadataValue(plugin, type.id()));
+        livingEntity.setMetadata(Pinata.METADATA_KEY, new FixedMetadataValue(plugin, type.getId()));
 
-        mobCustomizerService.applyOptions(livingEntity, type.mobOptions());
+        mobCustomizerService.applyOptions(livingEntity, type.getMobOptions());
 
 
         Pinata pinata = new Pinata(type, livingEntity);
@@ -298,7 +301,8 @@ public class PinataService {
             hologramService.updateHologramFor(pinata);
             abilityService.tryTriggerAbilities(pinata);
 
-            if (pinata.getEntity() instanceof Sheep sheep) {
+            if (pinata.getEntity() instanceof Sheep) {
+                Sheep sheep = (Sheep) pinata.getEntity();
                 sheep.setColor(org.bukkit.DyeColor.values()[new Random().nextInt(org.bukkit.DyeColor.values().length)]);
             }
 
@@ -308,8 +312,9 @@ public class PinataService {
                         .stream()
                         .filter(e -> e instanceof Player)
                         .map(e -> (Player) e)
-                        .toList();
-                if (!nearbyPlayers.isEmpty() && pinata.getEntity() instanceof Mob mob) {
+                        .collect(Collectors.toList());
+                if (!nearbyPlayers.isEmpty() && pinata.getEntity() instanceof Mob) {
+                    Mob mob = (Mob) pinata.getEntity();
                     mob.setTarget(nearbyPlayers.get(new Random().nextInt(nearbyPlayers.size())));
                 }
             }
@@ -338,7 +343,8 @@ public class PinataService {
                 String sound = (String) map.get("sound");
 
                 List<PotionEffectType> potions = new ArrayList<>();
-                if (map.get("potion-effects") instanceof List<?> rawPotionList) {
+                if (map.get("potion-effects") instanceof List<?>) {
+                    List<?> rawPotionList = (List<?>) map.get("potion-effects");
                     for (Object rawEffect : rawPotionList) {
                         if (rawEffect instanceof String) {
                             PotionEffectType effectType = PotionEffectType.getByName((String) rawEffect);

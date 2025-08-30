@@ -8,6 +8,7 @@ import com.bentahsin.benthPinata.pinata.model.Pinata;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PinataKillCommand implements ISubCommand {
@@ -63,7 +64,7 @@ public class PinataKillCommand implements ISubCommand {
             messageManager.sendMessage(sender, "kill-command-failure", "%id%", String.valueOf(pinataId));
             return;
         }
-        messageManager.sendMessage(sender, "kill-command-success", "%id%", String.valueOf(pinataId), "%type%", pinataToKill.getType().id());
+        messageManager.sendMessage(sender, "kill-command-success", "%id%", String.valueOf(pinataId), "%type%", pinataToKill.getType().getId());
     }
 
     @Override
@@ -76,6 +77,6 @@ public class PinataKillCommand implements ISubCommand {
             }
             return suggestions;
         }
-        return List.of();
+        return Collections.emptyList();
     }
 }

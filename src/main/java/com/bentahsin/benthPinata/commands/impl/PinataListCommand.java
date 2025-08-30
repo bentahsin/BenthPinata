@@ -7,6 +7,7 @@ import com.bentahsin.benthPinata.pinata.model.Pinata;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PinataListCommand implements ISubCommand {
@@ -43,9 +44,9 @@ public class PinataListCommand implements ISubCommand {
             Pinata pinata = activePinatas.get(i);
             sender.sendMessage(messageManager.getMessage("list-command-format",
                     "%id%", String.valueOf(i + 1),
-                    "%type%", pinata.getType().id(),
+                    "%type%", pinata.getType().getId(),
                     "%health%", String.valueOf(pinata.getCurrentHealth()),
-                    "%max_health%", String.valueOf(pinata.getType().maxHealth()),
+                    "%max_health%", String.valueOf(pinata.getType().getMaxHealth()),
                     "%world%", pinata.getEntity().getWorld().getName(),
                     "%x%", String.valueOf(pinata.getEntity().getLocation().getBlockX()),
                     "%y%", String.valueOf(pinata.getEntity().getLocation().getBlockY()),
@@ -57,6 +58,6 @@ public class PinataListCommand implements ISubCommand {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
-        return List.of();
+        return Collections.emptyList();
     }
 }

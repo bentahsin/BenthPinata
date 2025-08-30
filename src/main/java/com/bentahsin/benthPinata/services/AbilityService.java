@@ -21,9 +21,9 @@ public class AbilityService {
 
     // Yetenek tetikleme ana mantığı
     public void tryTriggerAbilities(Pinata pinata) {
-        double currentHealthPercentage = (double) pinata.getCurrentHealth() * 100 / pinata.getType().maxHealth();
+        double currentHealthPercentage = (double) pinata.getCurrentHealth() * 100 / pinata.getType().getMaxHealth();
 
-        for (PinataAbility ability : pinata.getType().abilities()) {
+        for (PinataAbility ability : pinata.getType().getAbilities()) {
             if (ability.getTrigger().equalsIgnoreCase("HEALTH_BELOW")) {
                 if (currentHealthPercentage <= ability.getValue() && !pinata.hasTriggeredAbility(ability)) {
                     executeAbility(pinata, ability);

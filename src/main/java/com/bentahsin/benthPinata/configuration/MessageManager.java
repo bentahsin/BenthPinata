@@ -34,7 +34,7 @@ public class MessageManager {
         }
 
         Matcher matcher = HEX_PATTERN.matcher(text);
-        StringBuilder buffer = new StringBuilder();
+        StringBuffer buffer = new StringBuffer();
 
         while (matcher.find()) {
             // #RRGGBB'yi bul ve onu &x&R&R&G&G&B&B formatına çevir.

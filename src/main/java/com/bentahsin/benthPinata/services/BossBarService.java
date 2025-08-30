@@ -36,7 +36,7 @@ public class BossBarService {
     public void createBossBar(Pinata pinata) {
         if (!enabled) return;
 
-        String title = messageManager.getMessage("bossbar-title", "%pinata_type%", pinata.getType().id());
+        String title = messageManager.getMessage("bossbar-title", "%pinata_type%", pinata.getType().getId());
         BossBar bossBar = Bukkit.createBossBar(title, this.color, this.style);
         bossBar.setProgress(1.0);
 
@@ -50,7 +50,7 @@ public class BossBarService {
         if (!enabled) return;
         BossBar bossBar = activeBossBars.get(pinata.getUniqueId());
         if (bossBar != null) {
-            double progress = (double) pinata.getCurrentHealth() / pinata.getType().maxHealth();
+            double progress = (double) pinata.getCurrentHealth() / pinata.getType().getMaxHealth();
             bossBar.setProgress(Math.max(0, progress));
         }
     }

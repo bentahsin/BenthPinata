@@ -59,10 +59,12 @@ public class PinataStatsCommand implements ISubCommand {
         }
 
         // Eğer alt komut yoksa veya geçersizse, oyuncunun kendi istatistiklerini göster
-        if (!(sender instanceof Player player)) {
+        if (!(sender instanceof Player)) {
             messageManager.sendMessage(sender, "player-only-command");
             return;
         }
+
+        Player player = (Player) sender;
 
         PlayerStats stats = playerStatsService.getStats(player);
 
@@ -75,7 +77,7 @@ public class PinataStatsCommand implements ISubCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
         if (args.length == 1 && sender.hasPermission("benthpinata.stats.top")) {
-            return List.of("top");
+            return Collections.singletonList("top");
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("top") && sender.hasPermission("benthpinata.stats.top")) {
             return Arrays.asList("damage", "kills");

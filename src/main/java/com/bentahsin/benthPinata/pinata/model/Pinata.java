@@ -30,7 +30,7 @@ public class Pinata {
         this.uniqueId = UUID.randomUUID();
         this.type = type;
         this.entity = entity;
-        this.currentHealth = type.maxHealth();
+        this.currentHealth = type.getMaxHealth();
         this.damagers = new HashMap<>();
     }
 

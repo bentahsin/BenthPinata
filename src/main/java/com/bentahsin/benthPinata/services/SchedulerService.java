@@ -35,13 +35,13 @@ public class SchedulerService {
         for (Map<?, ?> map : scheduleMaps) {
             try {
                 String id = (String) map.get("id");
-                boolean enabled = (boolean) map.get("enabled");
+                boolean enabled = (Boolean) map.get("enabled");
                 if (!enabled) continue; // Kapalıysa yükleme.
 
                 String pinataType = (String) map.get("pinata-type");
                 String dayStr = ((String) map.get("day")).toUpperCase();
                 String timeStr = (String) map.get("time");
-                int minPlayers = (int) map.get("minimum-players");
+                int minPlayers = (Integer) map.get("minimum-players");
                 List<?> rawAnnounceList = (List<?>) map.get("announce-before");
                 List<Integer> announceMinutes = new ArrayList<>();
 
@@ -84,21 +84,21 @@ public class SchedulerService {
 
                 for (ScheduledEventConfig event : scheduledEvents) {
                     // Gün kontrolü (EVERYDAY veya doğru gün)
-                    boolean dayMatches = (event.dayOfWeek() == null || event.dayOfWeek() == currentDay);
+                    boolean dayMatches = (event.getDayOfWeek() == null || event.getDayOfWeek() == currentDay);
                     if (!dayMatches) continue;
 
                     // Etkinlik başlangıç zamanı kontrolü
-                    if (event.time().equals(currentTime)) {
+                    if (event.getTime().equals(currentTime)) {
                         tryStartEvent(event);
                         continue; // Aynı dakika içinde duyuru yapmasını engelle
                     }
 
                     // Duyuru zamanı kontrolü
-                    for (int minutesBefore : event.announceBeforeMinutes()) {
-                        if (event.time().minusMinutes(minutesBefore).equals(currentTime)) {
+                    for (int minutesBefore : event.getAnnounceBeforeMinutes()) {
+                        if (event.getTime().minusMinutes(minutesBefore).equals(currentTime)) {
                             String message = plugin.getMessageManager().getMessage("scheduled-event-announcement",
                                     "%minutes%", String.valueOf(minutesBefore),
-                                    "%pinata_type%", event.pinataType());
+                                    "%pinata_type%", event.getPinataType());
                             Bukkit.broadcastMessage(message);
                             break; // Bu etkinlik için başka duyuru kontrol etme
                         }
@@ -109,18 +109,18 @@ public class SchedulerService {
     }
 
     private void tryStartEvent(ScheduledEventConfig event) {
-        if (Bukkit.getOnlinePlayers().size() < event.minimumPlayers()) {
-            plugin.getLogger().info("Zamanlanmış etkinlik '" + event.id() + "' minimum oyuncu sayısına (" + event.minimumPlayers() + ") ulaşılamadığı için atlandı.");
+        if (Bukkit.getOnlinePlayers().size() < event.getMinimumPlayers()) {
+            plugin.getLogger().info("Zamanlanmış etkinlik '" + event.getId() + "' minimum oyuncu sayısına (" + event.getMinimumPlayers() + ") ulaşılamadığı için atlandı.");
             return;
         }
 
         if (!plugin.getPinataRepository().findAll().isEmpty()) {
-            plugin.getLogger().info("Zamanlanmış etkinlik '" + event.id() + "' başka bir Piñata aktif olduğu için atlandı.");
+            plugin.getLogger().info("Zamanlanmış etkinlik '" + event.getId() + "' başka bir Piñata aktif olduğu için atlandı.");
             return;
         }
 
-        String message = plugin.getMessageManager().getMessage("scheduled-event-start", "%pinata_type%", event.pinataType());
+        String message = plugin.getMessageManager().getMessage("scheduled-event-start", "%pinata_type%", event.getPinataType());
         Bukkit.broadcastMessage(message);
-        pinataService.startEvent(event.pinataType());
+        pinataService.startEvent(event.getPinataType());
     }
 }

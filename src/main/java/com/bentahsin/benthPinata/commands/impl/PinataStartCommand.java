@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,10 +48,11 @@ public class PinataStartCommand implements ISubCommand {
         if (args.length > 1) {
             // Durum 1: /pinata start <tür> here
             if (args.length == 2 && args[1].equalsIgnoreCase("here")) {
-                if (!(sender instanceof Player player)) {
+                if (!(sender instanceof Player)) { // DEĞİŞİKLİK 1
                     messageManager.sendMessage(sender, "player-only-command");
                     return;
                 }
+                Player player = (Player) sender; // DEĞİŞİKLİK 1
                 customLocation = player.getLocation();
             }
             // Durum 2: /pinata start <tür> <dünya> <x> <y> <z>
@@ -99,21 +101,26 @@ public class PinataStartCommand implements ISubCommand {
             if (sender instanceof Player) {
                 suggestions.add("here");
             }
-            suggestions.addAll(Bukkit.getWorlds().stream().map(World::getName).toList());
+            // DEĞİŞİKLİK 2: .toList() yerine .collect(Collectors.toList()) kullanıldı
+            List<String> worldNames = Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
+            suggestions.addAll(worldNames);
+
             return suggestions.stream()
                     .filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase()))
                     .collect(Collectors.toList());
         }
 
         // /pinata start <tür> <dünya> [x] [y] [z]
-        if (args.length >= 3 && args.length <= 5 && sender instanceof Player player) {
-            Location loc = player.getLocation();
-            if (args.length == 3) return List.of(String.valueOf(loc.getBlockX()));
-            if (args.length == 4) return List.of(String.valueOf(loc.getBlockY()));
-            if (args.length == 5) return List.of(String.valueOf(loc.getBlockZ()));
-            if (args.length > 5) return List.of();
+        if (args.length >= 3 && args.length <= 5) {
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                Location loc = player.getLocation();
+                if (args.length == 3) return Collections.singletonList(String.valueOf(loc.getBlockX()));
+                if (args.length == 4) return Collections.singletonList(String.valueOf(loc.getBlockY()));
+                if (args.length == 5) return Collections.singletonList(String.valueOf(loc.getBlockZ()));
+            }
         }
 
-        return List.of();
+        return Collections.emptyList();
     }
 }

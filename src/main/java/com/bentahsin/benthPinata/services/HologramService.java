@@ -44,7 +44,7 @@ public class HologramService {
     private List<String> getHologramLines(Pinata pinata) {
         return messageManager.getMessageList("hologram.lines").stream()
                 .map(line -> line.replace("%health%", String.valueOf(pinata.getCurrentHealth())))
-                .map(line -> line.replace("%max_health%", String.valueOf(pinata.getType().maxHealth())))
+                .map(line -> line.replace("%max_health%", String.valueOf(pinata.getType().getMaxHealth())))
                 .collect(Collectors.toList());
     }
 

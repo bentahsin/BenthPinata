@@ -34,29 +34,39 @@ public class MobCustomizerService {
         applyGeneralOptions(entity, options);
         applyEquipmentOptions(entity, options);
 
-        if (entity instanceof Sheep sheep) {
+        if (entity instanceof Sheep) {
+            Sheep sheep = (Sheep) entity;
             applySheepOptions(sheep, options);
-        } else if (entity instanceof Horse horse) {
+        } else if (entity instanceof Horse) {
+            Horse horse = (Horse) entity;
             applyHorseOptions(horse, options);
-        } else if (entity instanceof Llama llama) {
+        } else if (entity instanceof Llama) {
+            Llama llama = (Llama) entity;
             applyLlamaOptions(llama, options);
-        } else if (entity instanceof Parrot parrot) {
+        } else if (entity instanceof Parrot) {
+            Parrot parrot = (Parrot) entity;
             applyParrotOptions(parrot, options);
-        } else if (entity instanceof Ocelot ocelot) {
+        } else if (entity instanceof Ocelot) {
+            Ocelot ocelot = (Ocelot) entity;
             applyOcelotOptions(ocelot, options);
-        } else if (entity instanceof Creeper creeper) {
+        } else if (entity instanceof Creeper) {
+            Creeper creeper = (Creeper) entity;
             applyCreeperOptions(creeper, options);
-        } else if (entity instanceof Villager villager) {
+        } else if (entity instanceof Villager) {
+            Villager villager = (Villager) entity;
             applyVillagerOptions(villager, options);
-        } else if (entity instanceof ZombieVillager zVillager) {
+        } else if (entity instanceof ZombieVillager) {
+            ZombieVillager zVillager = (ZombieVillager) entity;
             applyZombieVillagerOptions(zVillager, options);
         }
 
-        if (options.get("nbt-data") instanceof String nbtData) {
+        if (options.get("nbt-data") instanceof String) {
+            String nbtData = (String) options.get("nbt-data");
             try {
                 NBT.modify(entity, nbt -> {
                     ReadWriteNBT parsedNbt = NBT.parseNBT(nbtData);
-                    if (parsedNbt instanceof NBTCompound customNbt) {
+                    if (parsedNbt instanceof NBTCompound) {
+                        NBTCompound customNbt = (NBTCompound) parsedNbt;
                         nbt.mergeCompound(customNbt);
                     } else {
                         plugin.getLogger().warning("nbt-data için sağlanan veri bir NBT Compound ('{...}') değil. İşlem atlandı.");
@@ -69,16 +79,21 @@ public class MobCustomizerService {
     }
 
     private void applyGeneralOptions(LivingEntity entity, Map<String, Object> options) {
-        if (options.get("glowing") instanceof Boolean glowing) {
+        if (options.get("glowing") instanceof Boolean) {
+            boolean glowing = (Boolean) options.get("glowing");
             entity.setGlowing(glowing);
         }
-        if (options.get("custom-name") instanceof String name) {
+        if (options.get("custom-name") instanceof String) {
+            String name = (String) options.get("custom-name");
             entity.setCustomName(ChatColor.translateAlternateColorCodes('&', name));
         }
-        if (options.get("custom-name-visible") instanceof Boolean visible) {
+        if (options.get("custom-name-visible") instanceof Boolean) {
+            boolean visible = (Boolean) options.get("custom-name-visible");
             entity.setCustomNameVisible(visible);
         }
-        if (entity instanceof Ageable ageable && options.get("is-baby") instanceof Boolean isBaby) {
+        if (entity instanceof Ageable && options.get("is-baby") instanceof Boolean) {
+            Ageable ageable = (Ageable) entity;
+            boolean isBaby = (Boolean) options.get("is-baby");
             if (isBaby) ageable.setBaby();
             else ageable.setAdult();
         }
@@ -88,17 +103,33 @@ public class MobCustomizerService {
         EntityEquipment equipment = entity.getEquipment();
         if (equipment == null) return;
 
-        if (options.get("helmet") instanceof String materialName) equipment.setHelmet(createItem(materialName));
-        if (options.get("chestplate") instanceof String materialName) equipment.setChestplate(createItem(materialName));
-        if (options.get("leggings") instanceof String materialName) equipment.setLeggings(createItem(materialName));
-        if (options.get("boots") instanceof String materialName) equipment.setBoots(createItem(materialName));
-        if (options.get("main-hand") instanceof String materialName) equipment.setItemInMainHand(createItem(materialName));
+        if (options.get("helmet") instanceof String) {
+            String materialName = (String) options.get("helmet");
+            equipment.setHelmet(createItem(materialName));
+        }
+        if (options.get("chestplate") instanceof String) {
+            String materialName = (String) options.get("chestplate");
+            equipment.setChestplate(createItem(materialName));
+        }
+        if (options.get("leggings") instanceof String) {
+            String materialName = (String) options.get("leggings");
+            equipment.setLeggings(createItem(materialName));
+        }
+        if (options.get("boots") instanceof String) {
+            String materialName = (String) options.get("boots");
+            equipment.setBoots(createItem(materialName));
+        }
+        if (options.get("main-hand") instanceof String) {
+            String materialName = (String) options.get("main-hand");
+            equipment.setItemInMainHand(createItem(materialName));
+        }
     }
 
     // --- 1.13.2 Uyumlu Metotlar ---
 
     private void applyOcelotOptions(Ocelot ocelot, Map<String, Object> options) {
-        if (options.get("ocelot-type") instanceof String typeName) {
+        if (options.get("ocelot-type") instanceof String) {
+            String typeName = (String) options.get("ocelot-type");
             try {
                 ocelot.setCatType(Ocelot.Type.valueOf(typeName.toUpperCase()));
             } catch (IllegalArgumentException e) {
@@ -108,7 +139,8 @@ public class MobCustomizerService {
     }
 
     private void applyZombieVillagerOptions(ZombieVillager zVillager, Map<String, Object> options) {
-        if (options.get("villager-profession") instanceof String profName) {
+        if (options.get("villager-profession") instanceof String) {
+            String profName = (String) options.get("villager-profession");
             try {
                 zVillager.setVillagerProfession(Villager.Profession.valueOf(profName.toUpperCase()));
             } catch (IllegalArgumentException e) {
@@ -118,7 +150,8 @@ public class MobCustomizerService {
     }
 
     private void applyLlamaOptions(Llama llama, Map<String, Object> options) {
-        if (options.get("llama-color") instanceof String colorName) {
+        if (options.get("llama-color") instanceof String) {
+            String colorName = (String) options.get("llama-color");
             try {
                 llama.setColor(Llama.Color.valueOf(colorName.toUpperCase()));
             } catch (IllegalArgumentException e) {
@@ -128,7 +161,8 @@ public class MobCustomizerService {
     }
 
     private void applySheepOptions(Sheep sheep, Map<String, Object> options) {
-        if (options.get("color") instanceof String colorName) {
+        if (options.get("color") instanceof String) {
+            String colorName = (String) options.get("color");
             try {
                 sheep.setColor(DyeColor.valueOf(colorName.toUpperCase()));
             } catch (IllegalArgumentException e) {
@@ -138,14 +172,16 @@ public class MobCustomizerService {
     }
 
     private void applyHorseOptions(Horse horse, Map<String, Object> options) {
-        if (options.get("horse-color") instanceof String colorName) {
+        if (options.get("horse-color") instanceof String) {
+            String colorName = (String) options.get("horse-color");
             try {
                 horse.setColor(Horse.Color.valueOf(colorName.toUpperCase()));
             } catch (IllegalArgumentException e) {
                 plugin.getLogger().warning("Geçersiz at rengi: '" + colorName + "'.");
             }
         }
-        if (options.get("horse-style") instanceof String styleName) {
+        if (options.get("horse-style") instanceof String) {
+            String styleName = (String) options.get("horse-style");
             try {
                 horse.setStyle(Horse.Style.valueOf(styleName.toUpperCase()));
             } catch (IllegalArgumentException e) {
@@ -155,7 +191,8 @@ public class MobCustomizerService {
     }
 
     private void applyParrotOptions(Parrot parrot, Map<String, Object> options) {
-        if (options.get("variant") instanceof String variantName) {
+        if (options.get("variant") instanceof String) {
+            String variantName = (String) options.get("variant");
             try {
                 parrot.setVariant(Parrot.Variant.valueOf(variantName.toUpperCase()));
             } catch (IllegalArgumentException e) {
@@ -165,13 +202,15 @@ public class MobCustomizerService {
     }
 
     private void applyCreeperOptions(Creeper creeper, Map<String, Object> options) {
-        if (options.get("is-powered") instanceof Boolean isPowered) {
+        if (options.get("is-powered") instanceof Boolean) {
+            boolean isPowered = (Boolean) options.get("is-powered");
             creeper.setPowered(isPowered);
         }
     }
 
     private void applyVillagerOptions(Villager villager, Map<String, Object> options) {
-        if (options.get("profession") instanceof String profName) {
+        if (options.get("profession") instanceof String ) {
+            String profName = (String) options.get("profession");
             try {
                 villager.setProfession(Villager.Profession.valueOf(profName.toUpperCase()));
             } catch (IllegalArgumentException e) {
